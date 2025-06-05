@@ -393,7 +393,7 @@
 <h2 id="unsorted-bin-leak">unsorted bin leak
 </h2><p>在我们学pwn的时候会发现libc地址在我们的攻击中是一个举足轻重的一个地位，因此在堆块中也是如此因此我们这里要先从在堆块中泄露libc的方式来进行一个书写，这里我们就要引入unsorted bin模块的一个机制了，</p>
 <p>在我们观察过unsorted bin的源码的时候我们会发现整个unsorted bin其实就是一个双向链表，同时在unsorted bin中也有着一个我们必看的一个节点就是main_arena结构体，也就是我们下面代码的这个结构体因此我们要查看一下这个结构体。</p>
-<p><img src="/images/image-20250523153849404.png"
+<p><img src="../images/image-20250523153849404.png"
 	
 	
 	
@@ -575,7 +575,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p><img src="/images/image-20250523155515764.png"
+</div><p><img src="../images/image-20250523155515764.png"
 	
 	
 	
@@ -701,7 +701,7 @@
 </h2><p>unlink这个操着就是对相邻的堆块进行一个合并的一个函数但是在我们堆块的利用中这个同样也是一个高危害的一个地方</p>
 <p>这里就要引入一个新的概念就是堆块的指针数组，这个概念就是在我们创建堆块的时候这个数组就是记录我们创建的堆块的一个指针和地址，也就是说在这个数组中存放了我们创建数组的一个位置，那么我们如果通过合并的方式来把这个数组当成一个堆块申请出来那么我们是否可以控制我们对应的堆块指针来进行一个getshell</p>
 <p>这里我们假设我们一个正确的指针数组</p>
-<p><img src="/images/image-20250523160856603.png"
+<p><img src="../images/image-20250523160856603.png"
 	
 	
 	
@@ -712,7 +712,7 @@
 	
 ></p>
 <p>这个是一个正常的一个数组指针的一个状况那么如果我们可以在p1这个chunk的位置构造一个fake_chunk来伪装成一个可以合并的是的他会向p-0x18的位置写入一个任意地址写呢，所以我们的攻击手法就来了</p>
-<p><img src="/images/image-20250523161505796.png"
+<p><img src="../images/image-20250523161505796.png"
 	
 	
 	
@@ -938,7 +938,7 @@
 </div>
 </div><p>这里我们查看他的一个代码段发现他的绕过也非常简单就是fd方向指向的空间和我们释放的size的大小和fast bin对应的size要相同</p>
 <p>因此这个也是比较要构造的这里我们要看一下__malloc_hook-0x23的地方这里我们找到一个0x7f的一个地方这个数据会当成一个size块使得我们可以直接绕过这个验证并且可以直接写入one_gegat</p>
-<p><img src="/images/image-20250526194318205.png"
+<p><img src="../images/image-20250526194318205.png"
 	
 	
 	
@@ -1077,7 +1077,7 @@
 </h2><p>这里我们查看这个unsorted bin attack的一个方法和利用工具，但是这个方法和其他的不同的主要一个原因是他是一个思路而不是一个通用的攻击手法</p>
 <p>因此我们聊一下这个攻击思路，它主要是的用法就是可以在一个堆块中写入另一个对快的要给数据因此它可以存在一个攻击思路同理下面学习的lagebin也是用了这个思路。</p>
 <p>同样我们要看一下我们需要绕过的一些保护其实这个保护还是比较合理同样他也是比较好绕过的，这里我们查看一下他的保护</p>
-<p><img src="/images/image-20250526215816231.png"
+<p><img src="../images/image-20250526215816231.png"
 	
 	
 	
@@ -1237,7 +1237,7 @@
 </span></span><span class="line"><span class="cl">            <span class="n">bck</span><span class="o">-&gt;</span><span class="n">fd</span> <span class="o">=</span> <span class="n">victim</span><span class="p">;</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p><img src="/images/image-20250527193114418.png"
+</div><p><img src="../images/image-20250527193114418.png"
 	
 	
 	
@@ -1736,7 +1736,7 @@
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p>这里我们查看了这个源代码从源码中我们可以知道他大概干了上面东西</p>
-<p><img src="/images/image-20250528220843481.png"
+<p><img src="../images/image-20250528220843481.png"
 	
 	
 	
