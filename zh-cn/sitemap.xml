@@ -33,8 +33,6 @@
     <loc>https://Helios973.github.io/page/</loc>
     <lastmod>2019-05-28T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://Helios973.github.io/</loc>
-  </url><url>
     <loc>https://Helios973.github.io/categories/</loc>
     <xhtml:link
                 rel="alternate"
@@ -46,6 +44,8 @@
                 hreflang="zh-cn"
                 href="https://Helios973.github.io/categories/"
                 />
+  </url><url>
+    <loc>https://Helios973.github.io/links/</loc>
   </url><url>
     <loc>https://Helios973.github.io/search/</loc>
   </url><url>
