@@ -2,64 +2,70 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/</loc>
+    <loc>https://Helios973.github.io/</loc>
     <lastmod>2025-06-05T19:07:19+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/"
+                href="https://Helios973.github.io/en/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/"
+                href="https://Helios973.github.io/"
                 />
   </url><url>
-    <loc>http://localhost:1313/post/</loc>
+    <loc>https://Helios973.github.io/friend/</loc>
+    <lastmod>2025-06-05T19:07:19+08:00</lastmod>
+  </url><url>
+    <loc>https://Helios973.github.io/post/</loc>
     <lastmod>2025-06-05T18:35:23+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/p/pwn-heap/</loc>
+    <loc>https://Helios973.github.io/p/pwn-heap/</loc>
     <lastmod>2025-06-05T18:35:23+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/p/myblog/</loc>
+    <loc>https://Helios973.github.io/p/pwn-heap/</loc>
+    <lastmod>2025-06-05T18:34:50+08:00</lastmod>
+  </url><url>
+    <loc>https://Helios973.github.io/p/myblog/</loc>
     <lastmod>2025-06-05T17:39:22+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/archives/</loc>
+    <loc>https://Helios973.github.io/archives/</loc>
     <lastmod>2019-05-28T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/page/</loc>
+    <loc>https://Helios973.github.io/page/</loc>
     <lastmod>2019-05-28T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/categories/</loc>
+    <loc>https://Helios973.github.io/categories/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/categories/"
+                href="https://Helios973.github.io/en/categories/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/categories/"
+                href="https://Helios973.github.io/categories/"
                 />
   </url><url>
-    <loc>http://localhost:1313/links/</loc>
+    <loc>https://Helios973.github.io/links/</loc>
   </url><url>
-    <loc>http://localhost:1313/search/</loc>
+    <loc>https://Helios973.github.io/search/</loc>
   </url><url>
-    <loc>http://localhost:1313/tags/</loc>
+    <loc>https://Helios973.github.io/tags/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/tags/"
+                href="https://Helios973.github.io/en/tags/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/tags/"
+                href="https://Helios973.github.io/tags/"
                 />
   </url><url>
-    <loc>http://localhost:1313/categories/test/</loc>
+    <loc>https://Helios973.github.io/categories/test/</loc>
   </url><url>
-    <loc>http://localhost:1313/%E5%85%B3%E4%BA%8E/</loc>
+    <loc>https://Helios973.github.io/%E5%85%B3%E4%BA%8E/</loc>
   </url>
 </urlset>

@@ -2,10 +2,10 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Test on helios</title>
-        <link>http://localhost:1313/categories/test/</link>
+        <link>https://Helios973.github.io/categories/test/</link>
         <description>Recent content in Test on helios</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <copyright>helios</copyright><atom:link href="http://localhost:1313/categories/test/index.xml" rel="self" type="application/rss+xml" />
+        <copyright>helios</copyright><atom:link href="https://Helios973.github.io/categories/test/index.xml" rel="self" type="application/rss+xml" />
     </channel>
 </rss>

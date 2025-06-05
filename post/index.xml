@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Posts on helios</title>
-        <link>http://localhost:1313/post/</link>
+        <link>https://Helios973.github.io/post/</link>
         <description>Recent content in Posts on helios</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>helios</copyright>
-        <lastBuildDate>Thu, 05 Jun 2025 18:35:23 +0800</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 05 Jun 2025 18:35:23 +0800</lastBuildDate><atom:link href="https://Helios973.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>Pwn Heap</title>
-        <link>http://localhost:1313/p/pwn-heap/</link>
+        <link>https://Helios973.github.io/p/pwn-heap/</link>
         <pubDate>Thu, 05 Jun 2025 18:35:23 +0800</pubDate>
         
-        <guid>http://localhost:1313/p/pwn-heap/</guid>
+        <guid>https://Helios973.github.io/p/pwn-heap/</guid>
         <description>&lt;h1 id=&#34;pwn堆篇-堆块常见的攻击方式&#34;&gt;pwn堆篇-堆块常见的攻击方式
 &lt;/h1&gt;&lt;blockquote&gt;
 &lt;p&gt;[!NOTE]&lt;/p&gt;
@@ -20,7 +20,7 @@
 &lt;h2 id=&#34;unsorted-bin-leak&#34;&gt;unsorted bin leak
 &lt;/h2&gt;&lt;p&gt;在我们学pwn的时候会发现libc地址在我们的攻击中是一个举足轻重的一个地位，因此在堆块中也是如此因此我们这里要先从在堆块中泄露libc的方式来进行一个书写，这里我们就要引入unsorted bin模块的一个机制了，&lt;/p&gt;
 &lt;p&gt;在我们观察过unsorted bin的源码的时候我们会发现整个unsorted bin其实就是一个双向链表，同时在unsorted bin中也有着一个我们必看的一个节点就是main_arena结构体，也就是我们下面代码的这个结构体因此我们要查看一下这个结构体。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/image-20250523153849404.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250523153849404.png&#34;
 	
 	
 	
@@ -202,7 +202,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/image-20250523155515764.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250523155515764.png&#34;
 	
 	
 	
@@ -328,7 +328,7 @@
 &lt;/h2&gt;&lt;p&gt;unlink这个操着就是对相邻的堆块进行一个合并的一个函数但是在我们堆块的利用中这个同样也是一个高危害的一个地方&lt;/p&gt;
 &lt;p&gt;这里就要引入一个新的概念就是堆块的指针数组，这个概念就是在我们创建堆块的时候这个数组就是记录我们创建的堆块的一个指针和地址，也就是说在这个数组中存放了我们创建数组的一个位置，那么我们如果通过合并的方式来把这个数组当成一个堆块申请出来那么我们是否可以控制我们对应的堆块指针来进行一个getshell&lt;/p&gt;
 &lt;p&gt;这里我们假设我们一个正确的指针数组&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/image-20250523160856603.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250523160856603.png&#34;
 	
 	
 	
@@ -339,7 +339,7 @@
 	
 &gt;&lt;/p&gt;
 &lt;p&gt;这个是一个正常的一个数组指针的一个状况那么如果我们可以在p1这个chunk的位置构造一个fake_chunk来伪装成一个可以合并的是的他会向p-0x18的位置写入一个任意地址写呢，所以我们的攻击手法就来了&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/image-20250523161505796.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250523161505796.png&#34;
 	
 	
 	
@@ -565,7 +565,7 @@
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;这里我们查看他的一个代码段发现他的绕过也非常简单就是fd方向指向的空间和我们释放的size的大小和fast bin对应的size要相同&lt;/p&gt;
 &lt;p&gt;因此这个也是比较要构造的这里我们要看一下__malloc_hook-0x23的地方这里我们找到一个0x7f的一个地方这个数据会当成一个size块使得我们可以直接绕过这个验证并且可以直接写入one_gegat&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/image-20250526194318205.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250526194318205.png&#34;
 	
 	
 	
@@ -704,7 +704,7 @@
 &lt;/h2&gt;&lt;p&gt;这里我们查看这个unsorted bin attack的一个方法和利用工具，但是这个方法和其他的不同的主要一个原因是他是一个思路而不是一个通用的攻击手法&lt;/p&gt;
 &lt;p&gt;因此我们聊一下这个攻击思路，它主要是的用法就是可以在一个堆块中写入另一个对快的要给数据因此它可以存在一个攻击思路同理下面学习的lagebin也是用了这个思路。&lt;/p&gt;
 &lt;p&gt;同样我们要看一下我们需要绕过的一些保护其实这个保护还是比较合理同样他也是比较好绕过的，这里我们查看一下他的保护&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/image-20250526215816231.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250526215816231.png&#34;
 	
 	
 	
@@ -864,7 +864,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;bck&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fd&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;victim&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/image-20250527193114418.png&#34;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250527193114418.png&#34;
 	
 	
 	
@@ -1363,7 +1363,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;这里我们查看了这个源代码从源码中我们可以知道他大概干了上面东西&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/image-20250528220843481.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250528220843481.png&#34;
 	
 	
 	
@@ -1436,11 +1436,19 @@
 </description>
         </item>
         <item>
+        <title>Pwn Heap</title>
+        <link>https://Helios973.github.io/p/pwn-heap/</link>
+        <pubDate>Thu, 05 Jun 2025 18:34:50 +0800</pubDate>
+        
+        <guid>https://Helios973.github.io/p/pwn-heap/</guid>
+        <description></description>
+        </item>
+        <item>
         <title>Myblog</title>
-        <link>http://localhost:1313/p/myblog/</link>
+        <link>https://Helios973.github.io/p/myblog/</link>
         <pubDate>Thu, 05 Jun 2025 17:39:22 +0800</pubDate>
         
-        <guid>http://localhost:1313/p/myblog/</guid>
+        <guid>https://Helios973.github.io/p/myblog/</guid>
         <description>&lt;p&gt;helleo&lt;/p&gt;
 </description>
         </item>
