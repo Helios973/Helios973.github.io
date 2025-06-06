@@ -101,7 +101,7 @@
 &lt;/div&gt;&lt;h2 id=&#34;house-of-force&#34;&gt;house of force
 &lt;/h2&gt;&lt;h2 id=&#34;house-of-einherjar&#34;&gt;house of einherjar
 &lt;/h2&gt;&lt;p&gt;这个攻击手法主要使用的一个技术手段就是heap overlapping的一个攻击手法，同时他的主要一个攻击手法就是使用的是在利用释放不在fast bin大小范围的chunk尝试和前面的chunk进行要给unlink的一个机制&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;F:/pwn/images/image-20250601184317006.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250601184317006.png&#34;
 	
 	
 	
@@ -198,7 +198,7 @@
 &lt;/div&gt;
 &lt;/div&gt;&lt;h2 id=&#34;house-of-spreit&#34;&gt;house of spreit
 &lt;/h2&gt;&lt;p&gt;它主要使用的方式就是在目标位置伪造fastbin chunk 并且释放，从而达到分配指定地址的chunk的目的。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;F:/pwn/images/image-20250602213644026.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250602213644026.png&#34;
 	
 	
 	
