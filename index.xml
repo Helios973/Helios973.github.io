@@ -19,7 +19,7 @@
 &lt;p&gt;这里我们攻击流程和原理&lt;/p&gt;
 &lt;p&gt;这个漏洞和我们的glibc的版本和源码无关，主要是利用pie保护的一个缺陷。&lt;/p&gt;
 &lt;p&gt;因此我们的流程图是这样的&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;F:/pwn/images/image-20250524223941234.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250524223941234.png&#34;
 	
 	
 	
@@ -29,7 +29,7 @@
 	
 	
 &gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;F:/pwn/images/image-20250524224025348.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250524224025348.png&#34;
 	
 	
 	
@@ -39,7 +39,7 @@
 	
 	
 &gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;F:/pwn/images/image-20250524224041117.png&#34;
+&lt;p&gt;&lt;img src=&#34;https://Helios973.github.io/images/image-20250524224041117.png&#34;
 	
 	
 	
