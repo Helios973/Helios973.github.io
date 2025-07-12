@@ -292,6 +292,7 @@
       </ol>
     </li>
     <li><a href="#heap-overlappingoff-by-null低版本">heap overlapping+off by null低版本</a></li>
+    <li><a href="#heap-overlappingoff-by-null高版本">heap overlapping+off by null高版本</a></li>
   </ol>
 </nav>
         </div>
@@ -1783,6 +1784,22 @@
 </div>
 </div><hr>
 <p>但是这里同样还有一个新的类型的一个题目这里我们进行一个攻击</p>
+<h2 id="heap-overlappingoff-by-null高版本">heap overlapping+off by null高版本
+</h2><p>由于高版本的offbynull对整个libc的unlink进行了一个新的更改这里我们查看一下源码就可以明白在我们到了2.29以上的版本时对于chunk合并的需要绕过的检查总结有一下这些</p>
+<ul>
+<li>
+<p>prev_size 和按照 prev_size 找到的 chunk 的 size 是否相等。</p>
+</li>
+<li>
+<p>unlink</p>
+<p>chunksize (p) == prev_size (next_chunk (p))</p>
+</li>
+</ul>
+<p>​	fd-&gt;bk == bk-&gt;fd == p</p>
+<p>​	p-&gt;fd_nextsize == NULL （绕过对 fd_nextsize 和 bk_nextsize 的双向链表检查）</p>
+<p>这个就是我们主要需要绕过的一个方式</p>
+<p>因此我们可以思考是否可以创建一个fake_chunk来伪造我们的这个size的问题</p>
+<p>因此我使用的方法</p>
 
 </section>
 

