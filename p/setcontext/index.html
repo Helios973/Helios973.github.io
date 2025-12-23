@@ -6,7 +6,7 @@
 
 <link rel='canonical' href='https://Helios973.github.io/p/setcontext/'>
 
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Setcontext">
+<link rel="stylesheet" href="/scss/style.min.d86b0d3b80ae657381126418a5f6fcced0d4e6f865af40134fee4ac2c74355d2.css"><meta property='og:title' content="Setcontext">
 <meta property='og:description' content="前置知识 setcontext函数是libc中一个独特的函数，它的功能是传入一个 SigreturnFrame 结构指针，然后根据SigreturnFrame 的内容设置各种寄存器。因此从setcontext+53（不同 libc 偏移可能不同）的位置开始有如下 gadget，即根据 rdi 也就是第一个参数指向的 SigreturnFrame 结构设置寄存器。\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 pwndbg&gt; info address setcontext Symbol &#34;setcontext&#34; is at 0x7fab8d034c80 in a file compiled without debugging. pwndbg&gt; u 0x7fab8d034c80 20 ► 0x7fab8d034c80 &lt;setcontext&gt; push rdi 0x7fab8d034c81 &lt;setcontext+1&gt; lea rsi, [rdi + 0x128] 0x7fab8d034c88 &lt;setcontext+8&gt; xor edx, edx EDX =&gt; 0 0x7fab8d034c8a &lt;setcontext+10&gt; mov edi, 2 EDI =&gt; 2 0x7fab8d034c8f &lt;setcontext+15&gt; mov r10d, 8 R10D =&gt; 8 0x7fab8d034c95 &lt;setcontext+21&gt; mov eax, 0xe EAX =&gt; 0xe 0x7fab8d034c9a &lt;setcontext+26&gt; syscall 0x7fab8d034c9c &lt;setcontext+28&gt; pop rdi 0x7fab8d034c9d &lt;setcontext+29&gt; cmp rax, -0xfff 0x7fab8d034ca3 &lt;setcontext+35&gt; jae setcontext+128 &lt;setcontext+128&gt; 0x7fab8d034ca5 &lt;setcontext+37&gt; mov rcx, qword ptr [rdi + 0xe0] 0x7fab8d034cac &lt;setcontext+44&gt; fldenv [rcx] 0x7fab8d034cae &lt;setcontext+46&gt; ldmxcsr dword ptr [rdi + 0x1c0] 0x7fab8d034cb5 &lt;setcontext+53&gt; mov rsp, qword ptr [rdi + 0xa0] 0x7fab8d034cbc &lt;setcontext+60&gt; mov rbx, qword ptr [rdi + 0x80] 0x7fab8d034cc3 &lt;setcontext+67&gt; mov rbp, qword ptr [rdi + 0x78] 0x7fab8d034cc7 &lt;setcontext+71&gt; mov r12, qword ptr [rdi + 0x48] 0x7fab8d034ccb &lt;setcontext+75&gt; mov r13, qword ptr [rdi + 0x50] 0x7fab8d034ccf &lt;setcontext+79&gt; mov r14, qword ptr [rdi + 0x58] 0x7fab8d034cd3 &lt;setcontext+83&gt; mov r15, qword ptr [rdi + 0x60] 0x7fab8d034cd7 &lt;setcontext+87&gt; mov rcx, qword ptr [rdi + 0xa8] 0x7fab8d034cde &lt;setcontext+94&gt; push rcx 0x7fab8d034cdf &lt;setcontext+95&gt; mov rsi, qword ptr [rdi + 0x70] 0x7fab8d034ce3 &lt;setcontext+99&gt; mov rdx, qword ptr [rdi + 0x88] 0x7fab8d034cea &lt;setcontext+106&gt; mov rcx, qword ptr [rdi + 0x98] 0x7fab8d034cf1 &lt;setcontext+113&gt; mov r8, qword ptr [rdi + 0x28] 0x7fab8d034cf5 &lt;setcontext+117&gt; mov r9, qword ptr [rdi + 0x30] 0x7fab8d034cf9 &lt;setcontext+121&gt; mov rdi, qword ptr [rdi + 0x68] 0x7fab8d034cfd &lt;setcontext+125&gt; xor eax, eax EAX =&gt; 0 0x7fab8d034cff &lt;setcontext+127&gt; ret 0x7fab8d034d00 &lt;setcontext+128&gt; mov rcx, qword ptr [rip + 0x36b161] RCX, [0x7fab8d39fe68] =&gt; 0xffffffffffffff80 0x7fab8d034d07 &lt;setcontext+135&gt; neg eax 0x7fab8d034d09 &lt;setcontext+137&gt; mov dword ptr fs:[rcx], eax 0x7fab8d034d0c &lt;setcontext+140&gt; or rax, 0xffffffffffffffff 0x7fab8d034d10 &lt;setcontext+144&gt; ret 从这里我们可以大概明白一些数据这里我们主要需要控制的是一个rdi的数据并且rsp是rdi+0xa0的位置在低版本也就是2.27左右的版本就可以使用我们提前构造好的数据进行一个攻击，而我们这个时候的rdi就是可以使用删除一个堆块来实现，正好这个堆块的地址就会编程rdi指针因此我们就可以构造rsp，同时rsp这个指针正好可以控制栈迁移的位置\n">
 <meta property='og:url' content='https://Helios973.github.io/p/setcontext/'>
 <meta property='og:site_name' content='helios'>
@@ -789,6 +789,15 @@
 
         document.head.appendChild(customFont);
     }());
+</script>
+<script src="https://npm.elemecdn.com/nprogress@0.2.0/nprogress.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://npm.elemecdn.com/nprogress@0.2.0/nprogress.css" crossorigin="anonymous" />
+<script>
+    NProgress.start();
+    document.addEventListener("readystatechange", () => {
+        if (document.readyState === "interactive") NProgress.inc(0.8);
+        if (document.readyState === "complete") NProgress.done();
+    });
 </script>
 
     </body>
