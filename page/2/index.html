@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en-us" dir="ltr">
+<html lang="zh-cn" dir="ltr">
     <head>
-	<meta name="generator" content="Hugo 0.153.1"><meta charset='utf-8'>
+	<meta name="generator" content="Hugo 0.147.7"><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="轻点打，我是菜狗">
 <title>Pager 2 - helios</title>
 
 <link rel='canonical' href='https://Helios973.github.io/'>
 
-<link rel="stylesheet" href="/scss/style.min.6a692fd055deae459f2a9767f57f3855ba80cafd5041317f24f7360f6ca47cdf.css"><meta property='og:title' content="helios">
+<link rel="stylesheet" href="/scss/style.min.d86b0d3b80ae657381126418a5f6fcced0d4e6f865af40134fee4ac2c74355d2.css"><meta property='og:title' content="helios">
 <meta property='og:description' content="轻点打，我是菜狗">
 <meta property='og:url' content='https://Helios973.github.io/'>
 <meta property='og:site_name' content='helios'>
@@ -677,6 +677,15 @@
 
         document.head.appendChild(customFont);
     }());
+</script>
+<script src="https://npm.elemecdn.com/nprogress@0.2.0/nprogress.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://npm.elemecdn.com/nprogress@0.2.0/nprogress.css" crossorigin="anonymous" />
+<script>
+    NProgress.start();
+    document.addEventListener("readystatechange", () => {
+        if (document.readyState === "interactive") NProgress.inc(0.8);
+        if (document.readyState === "complete") NProgress.done();
+    });
 </script>
 
     </body>
